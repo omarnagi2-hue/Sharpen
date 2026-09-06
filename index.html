@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#F7F8FC">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Sharpen">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="manifest" href="manifest.json">
+<title>Sharpen: C1 vocabulary trainer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F7F8FC; --card:#FFFFFF; --ink:#17203D; --ink-2:#4A5372; --ink-3:#8A91AB;
+  --line:#E3E6F0; --line-2:#CDD2E2;
+  --cobalt:#2F5BEA; --cobalt-dk:#1E44C2; --cobalt-tint:#E9EEFF;
+  --sun:#FFCF3F; --sun-dk:#E0AE12;
+  --mint:#1FB77A; --mint-dk:#158C5C; --mint-tint:#E3F8EF;
+  --coral:#FF5C5C; --coral-dk:#D93B3B; --coral-tint:#FFE8E8;
+  --r:18px; --r-sm:12px;
+  --shadow-btn:0 4px 0 0;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family:"Nunito","Segoe UI",system-ui,-apple-system,sans-serif;
+  background:var(--paper); color:var(--ink); font-weight:600; font-size:16px; line-height:1.45;
+  -webkit-font-smoothing:antialiased; -webkit-tap-highlight-color:transparent;
+}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
+input,textarea{font:inherit;color:inherit}
+#app{max-width:480px;margin:0 auto;min-height:100%;position:relative;padding-bottom:40px}
+.screen{padding:18px 18px 120px}
+.hidden{display:none!important}
+:focus-visible{outline:3px solid var(--sun);outline-offset:2px;border-radius:6px}
+
+/* buttons */
+.btn{
+  display:flex;align-items:center;justify-content:center;gap:8px;width:100%;
+  padding:15px 18px;border-radius:16px;font-weight:800;font-size:17px;
+  background:var(--cobalt);color:#fff;box-shadow:var(--shadow-btn) var(--cobalt-dk);
+  transition:transform .06s,box-shadow .06s;
+}
+.btn:active{transform:translateY(4px);box-shadow:0 0 0 0 var(--cobalt-dk)}
+.btn.ghost{background:#fff;color:var(--cobalt);box-shadow:0 4px 0 0 var(--line-2);border:2px solid var(--line)}
+.btn.ghost:active{box-shadow:0 0 0 0 var(--line-2)}
+.btn.mint{background:var(--mint);box-shadow:0 4px 0 0 var(--mint-dk)}
+.btn.coral{background:var(--coral);box-shadow:0 4px 0 0 var(--coral-dk)}
+.btn.sun{background:var(--sun);color:var(--ink);box-shadow:0 4px 0 0 var(--sun-dk)}
+.btn[disabled]{opacity:.45;pointer-events:none}
+.btn.sm{padding:10px 14px;font-size:15px;border-radius:12px;width:auto}
+.icon-btn{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;background:#fff;border:2px solid var(--line);box-shadow:0 3px 0 0 var(--line-2)}
+.icon-btn:active{transform:translateY(3px);box-shadow:none}
+.icon-btn svg{width:22px;height:22px}
+
+/* top bar */
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px;min-height:44px}
+.topbar h1{font-size:26px;font-weight:900;letter-spacing:-.3px}
+.topbar .sub{font-size:14px;color:var(--ink-3);font-weight:700}
+.bar-track{flex:1;height:14px;background:var(--line);border-radius:99px;overflow:hidden}
+.bar-fill{height:100%;background:var(--mint);border-radius:99px;transition:width .35s ease}
+.bar-fill.cobalt{background:var(--cobalt)}
+
+/* today card */
+.today{
+  background:var(--ink);color:#fff;border-radius:22px;padding:18px 18px 16px;
+  display:grid;grid-template-columns:1fr auto;gap:14px;align-items:center;margin-bottom:18px;
+}
+.today .big{font-size:40px;font-weight:900;line-height:1;display:flex;align-items:center;gap:8px}
+.today .big svg{width:34px;height:34px}
+.today .lbl{font-size:14px;color:#B9C1E0;font-weight:700;margin-top:4px}
+.ring{width:84px;height:84px;position:relative}
+.ring svg{width:84px;height:84px;transform:rotate(-90deg)}
+.ring .c1{fill:none;stroke:#3A4568;stroke-width:9}
+.ring .c2{fill:none;stroke:var(--sun);stroke-width:9;stroke-linecap:round;transition:stroke-dashoffset .5s ease}
+.ring .txt{position:absolute;inset:0;display:grid;place-items:center;font-size:15px;font-weight:900;text-align:center;line-height:1.1}
+.ring .txt small{font-size:10px;color:#B9C1E0;font-weight:700}
+
+.due-btn{margin-bottom:22px}
+
+h2.sec{font-size:15px;color:var(--ink-3);font-weight:800;margin:14px 0 10px}
+
+/* module cards */
+.mods{display:flex;flex-direction:column;gap:12px}
+.mod{
+  position:relative;display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:center;
+  background:var(--card);border:2px solid var(--line);border-radius:var(--r);padding:14px 16px 14px 14px;
+  box-shadow:0 4px 0 0 var(--line-2);text-align:left;width:100%;
+}
+.mod:active{transform:translateY(4px);box-shadow:none}
+.mod .badge{width:48px;height:48px;border-radius:14px;display:grid;place-items:center;color:#fff;font-weight:900;font-size:18px}
+.mod .name{font-weight:800;font-size:16px;line-height:1.2}
+.mod .meta{font-size:13px;color:var(--ink-3);font-weight:700;margin-top:3px}
+.mod .bar-track{height:8px;margin-top:8px}
+.mod .pct{font-weight:900;font-size:18px;min-width:44px;text-align:right}
+.mod.all .badge{background:var(--ink)}
+
+/* module screen */
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 16px}
+.chip{padding:8px 14px;border-radius:99px;border:2px solid var(--line);background:#fff;font-weight:800;font-size:14px;color:var(--ink-2)}
+.chip.on{background:var(--ink);border-color:var(--ink);color:#fff}
+.mode-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:8px 0 18px}
+.mode{border:2px solid var(--line);background:#fff;border-radius:14px;padding:12px;text-align:left;font-weight:800;box-shadow:0 3px 0 0 var(--line-2)}
+.mode small{display:block;font-size:12.5px;color:var(--ink-3);font-weight:700;margin-top:2px;line-height:1.3}
+.mode.on{border-color:var(--cobalt);background:var(--cobalt-tint);box-shadow:0 3px 0 0 var(--cobalt)}
+.stack{display:flex;flex-direction:column;gap:10px}
+.wordlist{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+.wrow{display:flex;justify-content:space-between;align-items:center;background:#fff;border:2px solid var(--line);border-radius:12px;padding:9px 12px;font-weight:800;font-size:15px;text-align:left;width:100%}
+.wrow small{color:var(--ink-3);font-weight:700;font-size:12.5px;margin-left:8px}
+.dots{display:flex;gap:3px}
+.dot{width:8px;height:8px;border-radius:99px;background:var(--line)}
+.dot.on{background:var(--mint)}
+
+/* flashcard */
+.flash-wrap{perspective:1200px;margin:6px 0 16px}
+.flash{
+  position:relative;width:100%;min-height:500px;transition:transform .45s cubic-bezier(.2,.8,.2,1);transform-style:preserve-3d;cursor:pointer;
+}
+.flash.flipped{transform:rotateY(180deg)}
+.face{
+  position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;
+  background:var(--card);border:2px solid var(--line);border-radius:24px;box-shadow:0 6px 0 0 var(--line-2);
+  padding:22px 20px;display:flex;flex-direction:column;overflow:auto;
+}
+.face.back{transform:rotateY(180deg)}
+.tag{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:99px;font-size:12.5px;font-weight:800;color:#fff;align-self:flex-start}
+.front-body{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;gap:10px}
+.term{font-size:40px;font-weight:900;letter-spacing:-.6px;line-height:1.05;word-break:break-word}
+.ipa{font-size:17px;color:var(--ink-3);font-weight:700}
+.speak{display:inline-flex;align-items:center;gap:8px;padding:10px 16px;border-radius:99px;background:var(--cobalt-tint);color:var(--cobalt);font-weight:800;font-size:15px}
+.speak svg{width:20px;height:20px}
+.hint{color:var(--ink-3);font-size:13px;font-weight:700;text-align:center}
+/* the swap: generic vs C1 */
+.swap{margin:12px 0 16px;padding:14px;border-radius:16px;background:var(--paper);border:2px dashed var(--line-2)}
+.swap .from{color:var(--ink-3);font-weight:700;text-decoration:line-through;text-decoration-thickness:2px;text-decoration-color:var(--coral);font-size:16px}
+.swap .arrow{color:var(--ink-3);font-size:14px;font-weight:800;margin:3px 0}
+.swap .to{font-size:26px;font-weight:900;color:var(--cobalt);line-height:1.1}
+.def{font-size:16.5px;line-height:1.45;margin-bottom:12px}
+.block{margin-bottom:12px}
+.block .k{font-size:12.5px;color:var(--ink-3);font-weight:800;margin-bottom:3px}
+.block .v{font-size:15px;line-height:1.45}
+.block .v em{font-style:italic;color:var(--ink-2)}
+.colls{display:flex;flex-wrap:wrap;gap:6px}
+.coll{padding:5px 10px;border-radius:9px;background:var(--cobalt-tint);color:var(--cobalt-dk);font-size:13.5px;font-weight:800}
+.assess{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+/* practice */
+.q-card{background:var(--card);border:2px solid var(--line);border-radius:22px;padding:20px 18px;box-shadow:0 5px 0 0 var(--line-2);margin-bottom:14px}
+.q-type{font-size:13px;color:var(--ink-3);font-weight:800;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.q-type .tag{font-size:11.5px;padding:3px 9px}
+.q-prompt{font-size:19px;font-weight:800;line-height:1.35;margin-bottom:12px}
+.q-basic{font-size:18px;line-height:1.45;padding:14px;border-radius:14px;background:var(--paper);border:2px solid var(--line);margin-bottom:12px}
+.q-basic b{background:#FFF1BF;padding:0 3px;border-radius:4px}
+.gap{display:inline-block;min-width:78px;border-bottom:3px solid var(--cobalt);color:var(--cobalt);text-align:center;font-weight:900;padding:0 6px}
+.field{width:100%;border:2px solid var(--line);border-radius:14px;padding:13px 14px;font-size:17px;font-weight:700;background:#fff;resize:none;min-height:54px;line-height:1.4}
+.field:focus{border-color:var(--cobalt);outline:none}
+.field.ok{border-color:var(--mint);background:var(--mint-tint)}
+.field.bad{border-color:var(--coral);background:var(--coral-tint)}
+.opts{display:flex;flex-direction:column;gap:10px}
+.opt{width:100%;text-align:left;padding:14px 16px;border-radius:14px;border:2px solid var(--line);background:#fff;font-weight:800;font-size:17px;box-shadow:0 3px 0 0 var(--line-2);display:flex;align-items:center;gap:12px}
+.opt .key{width:28px;height:28px;border-radius:8px;border:2px solid var(--line);display:grid;place-items:center;font-size:13px;color:var(--ink-3);flex:none}
+.opt.sel{border-color:var(--cobalt);background:var(--cobalt-tint);box-shadow:0 3px 0 0 var(--cobalt)}
+.opt.ok{border-color:var(--mint);background:var(--mint-tint);box-shadow:0 3px 0 0 var(--mint)}
+.opt.bad{border-color:var(--coral);background:var(--coral-tint);box-shadow:0 3px 0 0 var(--coral)}
+.opt[disabled]{cursor:default}
+.helpline{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.pill{padding:6px 11px;border-radius:99px;background:var(--paper);border:2px solid var(--line);font-size:13px;font-weight:800;color:var(--ink-2)}
+
+/* bottom action bar */
+.dock{position:fixed;left:0;right:0;bottom:0;padding:14px 18px calc(14px + env(safe-area-inset-bottom));background:var(--paper);border-top:2px solid var(--line)}
+.dock-in{max-width:480px;margin:0 auto}
+/* feedback sheet */
+.feedback{position:fixed;left:0;right:0;bottom:0;transform:translateY(105%);transition:transform .28s cubic-bezier(.2,.8,.2,1);z-index:20}
+.feedback.show{transform:translateY(0)}
+.fb-in{max-width:480px;margin:0 auto;padding:18px 18px calc(16px + env(safe-area-inset-bottom));border-radius:24px 24px 0 0}
+.feedback.ok .fb-in{background:var(--mint-tint);color:var(--mint-dk)}
+.feedback.bad .fb-in{background:var(--coral-tint);color:var(--coral-dk)}
+.fb-title{font-size:22px;font-weight:900;display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.fb-title svg{width:26px;height:26px}
+.fb-body{color:var(--ink);font-size:15px;line-height:1.45;margin-bottom:12px;max-height:38vh;overflow:auto}
+.fb-body p{margin-bottom:8px}
+.fb-body .model{padding:10px 12px;background:#fff;border-radius:12px;font-weight:700;border:2px solid rgba(0,0,0,.06)}
+.fb-body .model b{color:var(--cobalt)}
+.feedback.ok .btn{background:var(--mint);box-shadow:0 4px 0 0 var(--mint-dk)}
+.feedback.bad .btn{background:var(--coral);box-shadow:0 4px 0 0 var(--coral-dk)}
+
+/* summary */
+.summary{text-align:center;padding-top:30px}
+.summary .score{font-size:64px;font-weight:900;color:var(--cobalt);line-height:1}
+.summary .lbl{color:var(--ink-3);font-weight:800;margin-bottom:22px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:22px}
+.stat{background:#fff;border:2px solid var(--line);border-radius:16px;padding:12px 8px}
+.stat .n{font-size:26px;font-weight:900}
+.stat .l{font-size:12.5px;color:var(--ink-3);font-weight:800}
+.review-list{text-align:left;display:flex;flex-direction:column;gap:8px;margin-bottom:20px}
+.review-list .wrow{font-size:15px}
+.review-list .wrow.bad{border-color:var(--coral-tint);background:#FFF6F6}
+.review-list .wrow.ok{border-color:var(--mint-tint);background:#F4FCF8}
+
+/* settings */
+.setrow{display:flex;justify-content:space-between;align-items:center;background:#fff;border:2px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:10px}
+.seg{display:flex;gap:4px;background:var(--paper);padding:3px;border-radius:10px;border:2px solid var(--line)}
+.seg button{padding:6px 12px;border-radius:7px;font-weight:800;font-size:14px;color:var(--ink-3)}
+.seg button.on{background:var(--ink);color:#fff}
+.toast{position:fixed;left:50%;bottom:110px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:10px 16px;border-radius:12px;font-weight:800;opacity:0;transition:.25s;z-index:30;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.empty{text-align:center;color:var(--ink-3);padding:30px 10px;font-weight:700}
+
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="fb" class="feedback"><div class="fb-in" id="fb-in"></div></div>
+<div id="toast" class="toast"></div>
+
+<script>
+/* =========================================================
+   DATA: modules and the C1 vocabulary database
+   Each entry: t term, m module index, s sub-category,
+   b basic equivalent, d definition, n nuance, p IPA,
+   e example sentence, c collocations,
+   bs basic (B1/B2) sentence, cs C1 model sentence,
+   f accepted forms (inflections) for answer checking,
+   x near-synonyms to exclude as multiple-choice distractors
+   ========================================================= */
+const MODULES = [
+  {id:"verbs", name:"Manner-specific verbs", short:"Verbs", hue:"#2F5BEA", subs:["Movement","Speech","Sight","Emotion","Action"]},
+  {id:"adj",   name:"Extreme & precise adjectives", short:"Adjectives", hue:"#F2762E", subs:["Temperature & weather","Feelings","Size & degree","Quality"]},
+  {id:"nouns", name:"Precise nouns & nuances", short:"Nouns", hue:"#8B4DD6", subs:["Groups & quantities","Sounds & weather","Things & events","Feelings"]},
+  {id:"coll",  name:"Collocations & binomials", short:"Collocations", hue:"#139E8C", subs:["Binomial expressions","Adjective + noun","Verb + noun"]},
+  {id:"phr",   name:"Phrasal verbs with manner", short:"Phrasal verbs", hue:"#E23D7A", subs:["Speed & ease","Force & intrusion","Avoidance & withdrawal"]}
+];
+
+const DB = [
+/* ---------- Manner-specific verbs: Movement ---------- */
+{t:"prowl",m:0,s:"Movement",b:"walk quietly and stealthily, looking for something",d:"to move around quietly and secretly, especially like an animal hunting",n:"Suggests menace or hunting: slow, patient, watchful movement. Often used of animals, burglars or restless people at night.",p:"/praʊl/",e:"A fox prowled around the bins after midnight.",c:["prowl around","prowl through","prowl the streets"],bs:"The guard walked slowly and quietly around the building, looking for intruders.",cs:"The guard prowled around the building, looking for intruders.",f:["prowled","prowling","prowls"]},
+{t:"tiptoe",m:0,s:"Movement",b:"walk very quietly, on the tips of your toes",d:"to walk carefully and quietly so as not to be heard",n:"Careful and considerate: you do not want to disturb anyone. No sense of threat, unlike prowl.",p:"/ˈtɪptəʊ/",e:"She tiptoed past the sleeping baby.",c:["tiptoe into","tiptoe past","tiptoe around a subject"],bs:"He walked very quietly into the room so he wouldn't wake anyone.",cs:"He tiptoed into the room so he wouldn't wake anyone.",f:["tiptoed","tiptoeing","tiptoes"]},
+{t:"stride",m:0,s:"Movement",b:"walk with long, confident steps",d:"to walk with long, decisive steps in a particular direction",n:"Confidence and purpose, sometimes anger or impatience. The person knows where they are going.",p:"/straɪd/",e:"The CEO strode onto the stage without any notes.",c:["stride into","stride across","stride towards"],bs:"She walked confidently with big steps into the meeting room.",cs:"She strode into the meeting room.",f:["strode","striding","strides","stridden"]},
+{t:"stagger",m:0,s:"Movement",b:"walk unsteadily, almost falling",d:"to walk or move unsteadily, as if about to fall",n:"Caused by exhaustion, injury, drunkenness or shock. The body is barely under control.",p:"/ˈstæɡə/",e:"He staggered out of the wreckage, dazed but alive.",c:["stagger to your feet","stagger out of","stagger back"],bs:"The exhausted runner walked unsteadily across the finish line.",cs:"The exhausted runner staggered across the finish line.",f:["staggered","staggering","staggers"],x:["lurch"]},
+{t:"trudge",m:0,s:"Movement",b:"walk slowly with heavy steps",d:"to walk slowly and with effort, typically because of tiredness or difficult conditions",n:"Weariness and reluctance. Think of snow, mud, a long uphill road, or a task you do not want to do.",p:"/trʌdʒ/",e:"We trudged through the snow for three hours.",c:["trudge through","trudge along","trudge up"],bs:"They walked slowly and with heavy steps up the muddy hill.",cs:"They trudged up the muddy hill.",f:["trudged","trudging","trudges"]},
+{t:"dart",m:0,s:"Movement",b:"move suddenly and quickly",d:"to move suddenly and rapidly in a particular direction",n:"Speed and suddenness, usually a short distance. Small creatures, eyes and children dart.",p:"/dɑːt/",e:"A lizard darted across the path.",c:["dart across","dart out","eyes dart"],bs:"The child ran quickly and suddenly across the road.",cs:"The child darted across the road.",f:["darted","darting","darts"],x:["scurry"]},
+{t:"saunter",m:0,s:"Movement",b:"walk slowly in a relaxed way",d:"to walk in a slow, relaxed, unhurried way",n:"Leisure and ease, sometimes a hint of casual arrogance: the person is not in a hurry and does not care who notices.",p:"/ˈsɔːntə/",e:"He sauntered into the office twenty minutes late, coffee in hand.",c:["saunter in","saunter along","saunter over"],bs:"He walked in a relaxed, unhurried way along the beach.",cs:"He sauntered along the beach.",f:["sauntered","sauntering","saunters"]},
+{t:"lurch",m:0,s:"Movement",b:"move suddenly and unsteadily",d:"to make a sudden, unsteady movement forward or sideways",n:"A single jolt rather than continued walking. Vehicles, boats and shocked people lurch.",p:"/lɜːtʃ/",e:"The bus lurched forward and everyone grabbed the rails.",c:["lurch forward","lurch sideways","lurch to a halt"],bs:"The car moved forward suddenly and jerkily when he released the clutch.",cs:"The car lurched forward when he released the clutch.",f:["lurched","lurching","lurches"],x:["stagger"]},
+{t:"scurry",m:0,s:"Movement",b:"run with short, quick steps",d:"to move hurriedly with short, quick steps",n:"Busy, slightly panicked movement. Mice, insects and crowds in the rain scurry.",p:"/ˈskʌri/",e:"Commuters scurried for cover when the rain started.",c:["scurry away","scurry around","scurry for cover"],bs:"The mice ran with quick little steps back into the hole.",cs:"The mice scurried back into the hole.",f:["scurried","scurrying","scurries"],x:["dart"]},
+/* ---------- Speech ---------- */
+{t:"mumble",m:0,s:"Speech",b:"speak quietly and unclearly",d:"to say something indistinctly and quietly",n:"Shyness, embarrassment or low confidence. The listener cannot make out the words.",p:"/ˈmʌmbl/",e:"He mumbled an apology and looked at the floor.",c:["mumble an apology","mumble to yourself","mumble under your breath"],bs:"She said something quietly and unclearly that nobody could understand.",cs:"She mumbled something nobody could understand.",f:["mumbled","mumbling","mumbles"],x:["mutter"]},
+{t:"mutter",m:0,s:"Speech",b:"speak quietly, often complaining",d:"to say something in a low voice, typically in irritation",n:"The difference from mumble is attitude: mutter carries annoyance or private complaint.",p:"/ˈmʌtə/",e:"'Typical,' she muttered under her breath.",c:["mutter under your breath","mutter darkly","mutter to yourself"],bs:"He said quietly and in an annoyed way that the meeting was a waste of time.",cs:"He muttered that the meeting was a waste of time.",f:["muttered","muttering","mutters"],x:["mumble"]},
+{t:"snap",m:0,s:"Speech",b:"speak sharply and angrily",d:"to say something quickly in an irritated or angry way",n:"A short, sudden burst of irritation, often at someone who did not deserve it.",p:"/snæp/",e:"'I heard you the first time,' he snapped.",c:["snap at somebody","snap back","snap a reply"],bs:"She replied sharply and angrily when he asked again.",cs:"She snapped at him when he asked again.",f:["snapped","snapping","snaps"]},
+{t:"blurt out",m:0,s:"Speech",b:"say something suddenly, without thinking",d:"to say something suddenly and without careful consideration",n:"Impulsive. Often used when someone reveals a secret or says something awkward by accident.",p:"/blɜːt aʊt/",e:"He blurted out the surprise party plans before I could stop him.",c:["blurt out the truth","blurt out a secret","blurt something out"],bs:"She suddenly said the secret without thinking.",cs:"She blurted out the secret.",f:["blurted out","blurting out","blurts out","blurted","blurt"]},
+{t:"hiss",m:0,s:"Speech",b:"say something angrily in a whisper",d:"to say something in a sharp, angry whisper",n:"Suppressed anger: the speaker is furious but does not want to be overheard.",p:"/hɪs/",e:"'Get out now,' she hissed.",c:["hiss at somebody","hiss through your teeth"],bs:"'Don't touch that,' she said in an angry whisper.",cs:"'Don't touch that,' she hissed.",f:["hissed","hissing","hisses"]},
+{t:"ramble",m:0,s:"Speech",b:"talk at length in a confused way",d:"to talk or write at length without a clear point",n:"Boring for the listener. The speaker drifts from topic to topic with no structure.",p:"/ˈræmbl/",e:"The speaker rambled on for forty minutes about his childhood.",c:["ramble on about","ramble off topic"],bs:"He talked for a long time in a confused way about his holiday.",cs:"He rambled on about his holiday.",f:["rambled","rambling","rambles"]},
+{t:"stammer",m:0,s:"Speech",b:"speak with nervous pauses and repeated sounds",d:"to speak with involuntary pauses and repetition of sounds, often through nervousness",n:"Nervousness, fear or shock. Can also describe a permanent speech pattern.",p:"/ˈstæmə/",e:"'I... I didn't mean to,' he stammered.",c:["stammer out an excuse","stammer nervously"],bs:"She spoke with nervous pauses and repeated sounds when the police questioned her.",cs:"She stammered when the police questioned her.",f:["stammered","stammering","stammers"]},
+{t:"drawl",m:0,s:"Speech",b:"speak slowly, stretching the vowels",d:"to speak in a slow, lazy way with prolonged vowel sounds",n:"Relaxed and unhurried, sometimes bored or condescending. Also describes some regional accents.",p:"/drɔːl/",e:"'Well now,' he drawled, 'what do we have here?'",c:["speak in a drawl","drawl lazily"],bs:"'Take your time,' he said slowly, stretching out the words.",cs:"'Take your time,' he drawled.",f:["drawled","drawling","drawls"]},
+{t:"chatter",m:0,s:"Speech",b:"talk quickly and continuously about unimportant things",d:"to talk rapidly and continuously about trivial matters",n:"Light, sociable and energetic. Can be affectionate (children) or mildly annoying.",p:"/ˈtʃætə/",e:"The children chattered excitedly on the way to the zoo.",c:["chatter away","chatter about","chatter excitedly"],bs:"The girls talked quickly and nonstop about the concert the whole way home.",cs:"The girls chattered about the concert the whole way home.",f:["chattered","chattering","chatters"]},
+/* ---------- Sight ---------- */
+{t:"glance",m:0,s:"Sight",b:"look quickly",d:"to take a brief, quick look",n:"Casual and quick, not focused. You glance at a watch, a message or a stranger.",p:"/ɡlɑːns/",e:"She glanced at her watch and stood up.",c:["glance at","glance over","glance through"],bs:"He looked quickly at the clock.",cs:"He glanced at the clock.",f:["glanced","glancing","glances"],x:["glimpse"]},
+{t:"glare",m:0,s:"Sight",b:"look angrily",d:"to stare in an angry or fierce way",n:"Open hostility: the anger is meant to be seen.",p:"/ɡleə/",e:"He glared at the driver who had cut him off.",c:["glare at somebody","glare across the table"],bs:"She looked angrily at her brother for breaking the vase.",cs:"She glared at her brother for breaking the vase.",f:["glared","glaring","glares"]},
+{t:"peer",m:0,s:"Sight",b:"look closely, with difficulty",d:"to look with difficulty or concentration at something",n:"Effort to see: poor light, fog, small print or simple curiosity.",p:"/pɪə/",e:"She peered through the fog, trying to make out the sign.",c:["peer at","peer through","peer into"],bs:"He looked closely and with difficulty at the tiny print.",cs:"He peered at the tiny print.",f:["peered","peering","peers"],x:["squint"]},
+{t:"gaze",m:0,s:"Sight",b:"look for a long time",d:"to look steadily and intently, often in admiration or thought",n:"Dreamy, admiring or lost in thought. Stars, paintings and loved ones are gazed at.",p:"/ɡeɪz/",e:"They gazed at the stars for hours.",c:["gaze at","gaze out of","gaze into the distance"],bs:"She looked for a long time at the painting, lost in admiration.",cs:"She gazed at the painting, lost in admiration.",f:["gazed","gazing","gazes"]},
+{t:"squint",m:0,s:"Sight",b:"look with your eyes half closed",d:"to look with partly closed eyes, usually against bright light or to see better",n:"Bright light, poor eyesight or effort to focus.",p:"/skwɪnt/",e:"He squinted at the screen in the afternoon sun.",c:["squint at","squint into","squint against the sun"],bs:"She looked with half-closed eyes at the bright sign.",cs:"She squinted at the bright sign.",f:["squinted","squinting","squints"],x:["peer"]},
+{t:"glimpse",m:0,s:"Sight",b:"see briefly and only partly",d:"to see something briefly or partially",n:"Incomplete and often accidental. You glimpse something that then disappears.",p:"/ɡlɪmps/",e:"I glimpsed a deer between the trees.",c:["catch a glimpse of","glimpse something through"],bs:"I saw the famous actor for just a second through the crowd.",cs:"I glimpsed the famous actor through the crowd.",f:["glimpsed","glimpsing","glimpses"],x:["glance"]},
+{t:"scan",m:0,s:"Sight",b:"look quickly over everything, searching",d:"to look quickly but thoroughly across something in search of a detail",n:"Systematic searching: your eyes sweep across a crowd, page or horizon.",p:"/skæn/",e:"She scanned the crowd for a familiar face.",c:["scan the horizon","scan the room for","scan a page"],bs:"He looked quickly across the whole page to find his name.",cs:"He scanned the page for his name.",f:["scanned","scanning","scans"]},
+/* ---------- Emotion ---------- */
+{t:"seethe",m:0,s:"Emotion",b:"be extremely angry but say nothing",d:"to be filled with intense but unexpressed anger",n:"Boiling anger held inside. Often 'seething with rage' or 'quietly seething'.",p:"/siːð/",e:"She sat in silence, seething at the insult.",c:["seethe with anger","seethe with rage","seethe inwardly"],bs:"He was extremely angry inside but said nothing.",cs:"He was seething but said nothing.",f:["seething","seethed","seethes"]},
+{t:"fret",m:0,s:"Emotion",b:"worry constantly about small things",d:"to be constantly or visibly anxious",n:"Nagging, restless worry, often about details that do not deserve it.",p:"/fret/",e:"Stop fretting about the weather; it will be fine.",c:["fret about","fret over"],bs:"She was worrying constantly about the small details of the party.",cs:"She was fretting over the details of the party.",f:["fretting","fretted","frets"]},
+{t:"yearn",m:0,s:"Emotion",b:"want something very much",d:"to have a deep, often sad longing for something",n:"Deep and wistful, usually for something distant or unattainable: home, the past, a person.",p:"/jɜːn/",e:"He yearned for the mountains of his childhood.",c:["yearn for","yearn to do"],bs:"She wanted very badly to return home.",cs:"She yearned to return home.",f:["yearned","yearning","yearns"]},
+{t:"sulk",m:0,s:"Emotion",b:"be silent and bad-tempered",d:"to be silent and moody because of annoyance or disappointment",n:"Childish, resentful withdrawal. The person refuses to talk to make a point.",p:"/sʌlk/",e:"He sulked all afternoon after losing the game.",c:["sulk in your room","go off in a sulk"],bs:"The boy was quiet and bad-tempered for hours after being told no.",cs:"The boy sulked for hours after being told no.",f:["sulked","sulking","sulks"]},
+{t:"dread",m:0,s:"Emotion",b:"be afraid of something that is going to happen",d:"to anticipate something with great fear or anxiety",n:"Heavy fear about the future: exams, appointments, bad news.",p:"/dred/",e:"I dread the dentist every six months.",c:["dread the thought of","dread doing something"],bs:"She was really afraid of the exam results coming next week.",cs:"She dreaded the exam results coming next week.",f:["dreaded","dreading","dreads"]},
+{t:"relish",m:0,s:"Emotion",b:"enjoy greatly",d:"to take great pleasure in something",n:"Active, almost greedy enjoyment. You relish a challenge, a chance or a meal.",p:"/ˈrelɪʃ/",e:"He relished every second of the debate.",c:["relish the chance","relish the prospect","relish the thought"],bs:"She really enjoyed the opportunity to prove them wrong.",cs:"She relished the opportunity to prove them wrong.",f:["relished","relishing","relishes"]},
+{t:"loathe",m:0,s:"Emotion",b:"hate very much",d:"to feel intense dislike or disgust for",n:"Stronger than hate and includes disgust. Often used with -ing forms.",p:"/ləʊð/",e:"I loathe cold showers.",c:["loathe doing something","loathe the sight of"],bs:"He hates very strongly getting up early.",cs:"He loathes getting up early.",f:["loathes","loathed","loathing"]},
+/* ---------- Action ---------- */
+{t:"snatch",m:0,s:"Action",b:"take quickly and roughly",d:"to take something quickly and often rudely or violently",n:"Speed and force, sometimes theft. Also 'snatch a few hours of sleep'.",p:"/snætʃ/",e:"A thief snatched her bag on the metro.",c:["snatch something from","snatch something away","snatch a break"],bs:"He took the phone quickly and roughly out of her hand.",cs:"He snatched the phone out of her hand.",f:["snatched","snatching","snatches"]},
+{t:"clutch",m:0,s:"Action",b:"hold very tightly",d:"to grasp tightly, often in fear or anxiety",n:"Fear or desperation: you clutch what you are afraid to lose.",p:"/klʌtʃ/",e:"The child clutched her mother's hand in the crowd.",c:["clutch at","clutch something to your chest"],bs:"She held the letter tightly against her chest.",cs:"She clutched the letter to her chest.",f:["clutched","clutching","clutches"]},
+{t:"fling",m:0,s:"Action",b:"throw violently or carelessly",d:"to throw forcefully or carelessly",n:"Anger, impatience or carelessness. Doors are flung open, bags are flung onto sofas.",p:"/flɪŋ/",e:"He flung his keys onto the table.",c:["fling open","fling something at","fling something onto"],bs:"She threw the bag carelessly onto the sofa and sat down.",cs:"She flung the bag onto the sofa and sat down.",f:["flung","flinging","flings"]},
+{t:"scribble",m:0,s:"Action",b:"write quickly and untidily",d:"to write or draw hastily and carelessly",n:"Haste, and usually hard to read afterwards.",p:"/ˈskrɪbl/",e:"She scribbled a note and left it on the fridge.",c:["scribble down","scribble a note","scribble on"],bs:"He wrote the number quickly and messily on his hand.",cs:"He scribbled the number on his hand.",f:["scribbled","scribbling","scribbles"]},
+{t:"devour",m:0,s:"Action",b:"eat quickly and hungrily",d:"to eat hungrily and quickly; also to read or absorb something eagerly",n:"Hunger, eagerness, greed. You can devour a meal or a book.",p:"/dɪˈvaʊə/",e:"He devoured the sandwich in three bites.",c:["devour a meal","devour a book"],bs:"The kids ate the pizza quickly and hungrily.",cs:"The kids devoured the pizza.",f:["devoured","devouring","devours"]},
+{t:"nibble",m:0,s:"Action",b:"eat in small bites",d:"to take small, gentle bites",n:"Lack of appetite, daintiness or nervousness. The opposite of devour.",p:"/ˈnɪbl/",e:"She nibbled at a biscuit while she waited.",c:["nibble at","nibble on"],bs:"She ate the cake in tiny bites without much appetite.",cs:"She nibbled at the cake.",f:["nibbled","nibbling","nibbles"]},
+{t:"slam",m:0,s:"Action",b:"shut or hit forcefully and loudly",d:"to shut or put something down with great force and noise",n:"Anger or frustration made audible.",p:"/slæm/",e:"He slammed the door and stormed out.",c:["slam the door","slam something shut","slam on the brakes"],bs:"She closed the door loudly and forcefully.",cs:"She slammed the door.",f:["slammed","slamming","slams"]},
+
+/* ---------- Extreme & precise adjectives ---------- */
+{t:"bitterly cold",m:1,s:"Temperature & weather",b:"very cold",d:"extremely and painfully cold",n:"Harsh, unpleasant cold that hurts, usually with wind. More vivid and literary than freezing.",p:"/ˈbɪtəli kəʊld/",e:"It was bitterly cold on the platform at six in the morning.",c:["bitterly cold wind","a bitterly cold morning"],bs:"It was very cold when we left the house.",cs:"It was bitterly cold when we left the house.",f:["bitterly cold"],x:["freezing"]},
+{t:"freezing",m:1,s:"Temperature & weather",b:"very cold",d:"extremely cold",n:"Informal and often exaggerated. Used of weather, rooms, water and people.",p:"/ˈfriːzɪŋ/",e:"Shut the window, I'm freezing!",c:["freezing cold","absolutely freezing"],bs:"The water in the lake was very cold.",cs:"The water in the lake was freezing.",f:["freezing"],x:["bitterly cold"]},
+{t:"scorching",m:1,s:"Temperature & weather",b:"very hot",d:"extremely hot, burning",n:"Oppressive heat that can damage: sun, summer afternoons, deserts.",p:"/ˈskɔːtʃɪŋ/",e:"We hid indoors during the scorching afternoon.",c:["scorching heat","scorching sun","a scorching summer"],bs:"It was very hot in the desert at noon.",cs:"It was scorching in the desert at noon.",f:["scorching"]},
+{t:"exhausted",m:1,s:"Feelings",b:"very tired",d:"completely drained of energy",n:"Total tiredness after effort. Often 'utterly exhausted'.",p:"/ɪɡˈzɔːstɪd/",e:"After the night shift, she was utterly exhausted.",c:["utterly exhausted","physically exhausted","emotionally exhausted"],bs:"He was very tired after the marathon.",cs:"He was exhausted after the marathon.",f:["exhausted"],x:["drained"]},
+{t:"drained",m:1,s:"Feelings",b:"very tired, emotionally",d:"having no energy left, especially emotionally",n:"Emotional depletion rather than physical effort: after grief, stress or a hard conversation.",p:"/dreɪnd/",e:"The funeral left everyone feeling drained.",c:["emotionally drained","feel drained"],bs:"After the difficult conversation she felt very tired inside.",cs:"After the difficult conversation she felt drained.",f:["drained"],x:["exhausted"]},
+{t:"ravenous",m:1,s:"Feelings",b:"very hungry",d:"extremely hungry",n:"Animal-like hunger: you could eat anything.",p:"/ˈrævənəs/",e:"We were ravenous after the hike.",c:["absolutely ravenous","a ravenous appetite"],bs:"We were very hungry after swimming all afternoon.",cs:"We were ravenous after swimming all afternoon.",f:["ravenous"]},
+{t:"furious",m:1,s:"Feelings",b:"very angry",d:"extremely angry",n:"Explosive, open anger. The standard C1 upgrade for 'very angry'.",p:"/ˈfjʊəriəs/",e:"She was furious when she saw the bill.",c:["absolutely furious","furious with somebody","furious at something"],bs:"Dad was very angry about the broken window.",cs:"Dad was furious about the broken window.",f:["furious"],x:["livid"]},
+{t:"livid",m:1,s:"Feelings",b:"very angry",d:"extremely angry, so angry your face changes colour",n:"More informal and story-telling than furious. 'He was absolutely livid.'",p:"/ˈlɪvɪd/",e:"He was livid when the flight was cancelled.",c:["absolutely livid"],bs:"My boss was very, very angry about the missed deadline.",cs:"My boss was livid about the missed deadline.",f:["livid"],x:["furious"]},
+{t:"petrified",m:1,s:"Feelings",b:"very frightened",d:"so frightened you cannot move",n:"Frozen fear, literally 'turned to stone'. Often with 'of'.",p:"/ˈpetrɪfaɪd/",e:"I'm petrified of spiders.",c:["petrified of","absolutely petrified"],bs:"She was very frightened of the dark as a child.",cs:"She was petrified of the dark as a child.",f:["petrified"]},
+{t:"minute",m:1,s:"Size & degree",b:"very small",d:"extremely small; tiny in detail",n:"Precise and formal. Note the pronunciation: it is not the unit of time. 'In minute detail.'",p:"/maɪˈnjuːt/",e:"There was a minute crack in the glass.",c:["minute detail","a minute amount","minute traces of"],bs:"There was a very small amount of dust on the lens.",cs:"There was a minute amount of dust on the lens.",f:["minute"]},
+{t:"colossal",m:1,s:"Size & degree",b:"very big",d:"extremely large or great",n:"Awe-inspiring scale. Also used for mistakes, costs and waste.",p:"/kəˈlɒsl/",e:"The project was a colossal waste of money.",c:["a colossal mistake","a colossal amount","a colossal statue"],bs:"They spent a very big amount of money on the wedding.",cs:"They spent a colossal amount on the wedding.",f:["colossal"]},
+{t:"spotless",m:1,s:"Quality",b:"very clean",d:"completely clean, without a single mark",n:"Perfection. Also used of reputations and records.",p:"/ˈspɒtləs/",e:"Her kitchen is always spotless.",c:["a spotless kitchen","a spotless reputation","a spotless record"],bs:"The hotel room was very clean.",cs:"The hotel room was spotless.",f:["spotless"]},
+{t:"exquisite",m:1,s:"Quality",b:"very beautiful",d:"extremely beautiful and delicate",n:"Refinement and craftsmanship: jewellery, embroidery, taste. Not for landscapes or people's faces.",p:"/ɪkˈskwɪzɪt/",e:"She wore an exquisite silver necklace.",c:["exquisite craftsmanship","exquisite taste","exquisite detail"],bs:"The embroidery on the dress was very beautiful.",cs:"The embroidery on the dress was exquisite.",f:["exquisite"]},
+{t:"hilarious",m:1,s:"Quality",b:"very funny",d:"extremely funny",n:"Laugh-out-loud funny. Often 'absolutely hilarious'.",p:"/hɪˈleəriəs/",e:"His impression of the manager was hilarious.",c:["absolutely hilarious"],bs:"The comedian's new show was very funny.",cs:"The comedian's new show was hilarious.",f:["hilarious"]},
+{t:"deafening",m:1,s:"Quality",b:"very loud",d:"so loud that you cannot hear anything else",n:"Overwhelming noise. Also the ironic 'deafening silence'.",p:"/ˈdefənɪŋ/",e:"The applause was deafening.",c:["a deafening noise","a deafening roar","a deafening silence"],bs:"The music at the concert was very loud.",cs:"The music at the concert was deafening.",f:["deafening"]},
+
+/* ---------- Precise nouns ---------- */
+{t:"throng",m:2,s:"Groups & quantities",b:"a big crowd",d:"a large, densely packed crowd",n:"Movement and pressure: streets, festivals, fans. Slightly literary.",p:"/θrɒŋ/",e:"A throng of fans waited outside the stadium.",c:["a throng of","throngs of tourists"],bs:"A big crowd of shoppers filled the street before Christmas.",cs:"A throng of shoppers filled the street before Christmas.",f:["throng","throngs"]},
+{t:"handful",m:2,s:"Groups & quantities",b:"a small number",d:"a small number of people or things",n:"Fewer than expected or hoped for. 'Only a handful of...'",p:"/ˈhændfʊl/",e:"Only a handful of students turned up.",c:["a handful of","only a handful"],bs:"Only a small number of people came to the meeting.",cs:"Only a handful of people came to the meeting.",f:["handful"]},
+{t:"bite",m:2,s:"Groups & quantities",b:"a small, quick meal",d:"a small, quick meal or snack",n:"Informal and casual: 'grab a bite'.",p:"/baɪt/",e:"Let's grab a bite before the film.",c:["grab a bite","a bite to eat"],bs:"Let's have a small quick meal before the train.",cs:"Let's grab a bite before the train.",f:["bite"]},
+{t:"feast",m:2,s:"Groups & quantities",b:"a big meal",d:"a large, elaborate meal, often for a celebration",n:"Abundance and celebration. Also 'a feast for the eyes'.",p:"/fiːst/",e:"Grandma prepared a feast for the whole family.",c:["a feast of","a wedding feast","a feast for the eyes"],bs:"They cooked a big special meal for the reunion.",cs:"They cooked a feast for the reunion.",f:["feast"]},
+{t:"downpour",m:2,s:"Sounds & weather",b:"heavy rain",d:"a heavy, sudden fall of rain",n:"Sudden and intense, usually short-lived. You get 'caught in a downpour'.",p:"/ˈdaʊnpɔː/",e:"We were caught in a downpour on the way home.",c:["a sudden downpour","a torrential downpour","caught in a downpour"],bs:"We got soaked in the heavy rain after lunch.",cs:"We got soaked in the downpour after lunch.",f:["downpour"]},
+{t:"hush",m:2,s:"Sounds & weather",b:"a sudden silence",d:"a sudden silence, especially in a crowd",n:"Expectant or respectful. 'A hush fell over the room.'",p:"/hʌʃ/",e:"A hush fell over the courtroom.",c:["a hush fell over","a hushed silence"],bs:"There was a sudden silence in the theatre when the lights went down.",cs:"A hush fell over the theatre when the lights went down.",f:["hush"]},
+{t:"roar",m:2,s:"Sounds & weather",b:"a loud, deep noise",d:"a loud, deep, prolonged sound",n:"Power: engines, crowds, waterfalls, lions.",p:"/rɔː/",e:"The roar of the engines drowned out our voices.",c:["the roar of the crowd","the roar of the engine","the roar of traffic"],bs:"The loud noise of the waterfall made talking impossible.",cs:"The roar of the waterfall made talking impossible.",f:["roar"]},
+{t:"glimmer",m:2,s:"Things & events",b:"a small amount of hope or light",d:"a faint sign of something; a faint, unsteady light",n:"Fragile and barely there. 'A glimmer of hope' is the classic collocation.",p:"/ˈɡlɪmə/",e:"There is still a glimmer of hope for the talks.",c:["a glimmer of hope","a glimmer of light","a glimmer of understanding"],bs:"There was a small amount of hope that the deal would survive.",cs:"There was a glimmer of hope that the deal would survive.",f:["glimmer"]},
+{t:"flaw",m:2,s:"Things & events",b:"a small problem or weakness",d:"a defect or weakness that spoils something",n:"The thing is otherwise good. Used of plans, arguments, products and characters.",p:"/flɔː/",e:"The plan had one fatal flaw.",c:["a fatal flaw","a serious flaw","a flaw in the argument"],bs:"There was a small problem in the design that made it fail.",cs:"There was a flaw in the design that made it fail.",f:["flaw","flaws"]},
+{t:"spree",m:2,s:"Things & events",b:"a short period of doing a lot of something",d:"a short period of intense, unrestrained activity",n:"Excess and lack of control: shopping, spending, crime.",p:"/spriː/",e:"She went on a shopping spree with her bonus.",c:["a shopping spree","a spending spree","a crime spree"],bs:"He spent a lot of money in a short period on clothes.",cs:"He went on a spending spree on clothes.",f:["spree"]},
+{t:"surge",m:2,s:"Things & events",b:"a sudden big increase",d:"a sudden, powerful increase or forward movement",n:"Force and momentum: prices, demand, emotion, crowds.",p:"/sɜːdʒ/",e:"There was a surge of interest after the film came out.",c:["a surge in","a surge of","a sudden surge"],bs:"There was a sudden big increase in demand for tickets.",cs:"There was a surge in demand for tickets.",f:["surge"]},
+{t:"grudge",m:2,s:"Feelings",b:"lasting anger about a past wrong",d:"a persistent feeling of resentment about a past wrong",n:"Long-term and deliberately kept alive: you 'hold' or 'bear' a grudge.",p:"/ɡrʌdʒ/",e:"He still holds a grudge against his old boss.",c:["hold a grudge against","bear a grudge"],bs:"She has stayed angry with her sister for years about the will.",cs:"She has held a grudge against her sister for years about the will.",f:["grudge"]},
+
+/* ---------- Collocations & binomials ---------- */
+{t:"back and forth",m:3,s:"Binomial expressions",b:"from one side to the other, repeatedly",d:"moving first one way and then the other, repeatedly",n:"Repetition and indecision: negotiations, arguments, pacing. The word order is fixed.",p:"/bæk ən ˈfɔːθ/",e:"They went back and forth on the price for an hour.",c:["go back and forth","back-and-forth negotiations"],bs:"They moved from one side to the other repeatedly for an hour.",cs:"They went back and forth for an hour.",f:["back and forth"]},
+{t:"pros and cons",m:3,s:"Binomial expressions",b:"advantages and disadvantages",d:"the arguments for and against something",n:"Balanced decision-making. You 'weigh up' the pros and cons.",p:"/prəʊz ən kɒnz/",e:"We weighed up the pros and cons of moving abroad.",c:["weigh up the pros and cons","the pros and cons of"],bs:"We discussed the advantages and disadvantages of the offer.",cs:"We discussed the pros and cons of the offer.",f:["pros and cons"]},
+{t:"sooner or later",m:3,s:"Binomial expressions",b:"eventually",d:"at some point in the future, certainly",n:"Inevitability, often with a hint of warning.",p:"/ˈsuːnər ɔː ˈleɪtə/",e:"Sooner or later, they'll find out.",c:["sooner or later + will"],bs:"Eventually, the truth will come out.",cs:"Sooner or later, the truth will come out.",f:["sooner or later"]},
+{t:"by and large",m:3,s:"Binomial expressions",b:"generally speaking",d:"on the whole; in most respects",n:"A summarising phrase, slightly formal. Usually at the start of a sentence.",p:"/baɪ ən lɑːdʒ/",e:"By and large, the feedback was positive.",c:["by and large + general statement"],bs:"Generally speaking, the reviews were good.",cs:"By and large, the reviews were good.",f:["by and large"]},
+{t:"safe and sound",m:3,s:"Binomial expressions",b:"unharmed",d:"completely safe and unhurt",n:"Relief after worry: someone arrives or is found safe and sound.",p:"/seɪf ən saʊnd/",e:"The hikers were found safe and sound.",c:["arrive safe and sound","return safe and sound"],bs:"The children arrived home unharmed.",cs:"The children arrived home safe and sound.",f:["safe and sound"]},
+{t:"crystal clear",m:3,s:"Adjective + noun",b:"very clear",d:"completely clear and easy to understand; perfectly transparent",n:"Emphatic, sometimes stern: 'Let me make this crystal clear.'",p:"/ˈkrɪstl klɪə/",e:"Let me make this crystal clear: no phones in the exam.",c:["make something crystal clear","crystal clear water"],bs:"The instructions were very clear.",cs:"The instructions were crystal clear.",f:["crystal clear"]},
+{t:"a heated debate",m:3,s:"Adjective + noun",b:"an angry discussion",d:"a discussion in which people become angry and excited",n:"Passion and tension. Debates are 'sparked' or 'provoked'.",p:"/ə ˈhiːtɪd dɪˈbeɪt/",e:"The proposal sparked a heated debate.",c:["spark a heated debate","provoke a heated debate"],bs:"The new law caused an angry discussion in parliament.",cs:"The new law sparked a heated debate in parliament.",f:["heated debate","heated debates"]},
+{t:"a vested interest",m:3,s:"Adjective + noun",b:"a personal reason to want something to happen",d:"a personal stake in an outcome, often financial",n:"Carries suspicion of bias: someone with a vested interest cannot be neutral.",p:"/ə ˈvestɪd ˈɪntrəst/",e:"He has a vested interest in the merger going ahead.",c:["have a vested interest in"],bs:"She has a personal reason to want the project approved.",cs:"She has a vested interest in the project being approved.",f:["vested interest","vested interests"]},
+{t:"make a concerted effort",m:3,s:"Verb + noun",b:"try hard, together",d:"to make a determined, coordinated attempt",n:"Deliberate and usually collective. Teams and governments make concerted efforts.",p:"/meɪk ə kənˈsɜːtɪd ˈefət/",e:"The team made a concerted effort to cut costs.",c:["make a concerted effort to"],bs:"The staff tried very hard together to reduce waste.",cs:"The staff made a concerted effort to reduce waste.",f:["concerted effort"]},
+{t:"strike a balance",m:3,s:"Verb + noun",b:"find a middle way",d:"to find a satisfactory compromise between two things",n:"Careful judgement between competing demands: work and family, speed and quality.",p:"/straɪk ə ˈbæləns/",e:"It's hard to strike a balance between work and family.",c:["strike a balance between"],bs:"We need to find a middle way between speed and quality.",cs:"We need to strike a balance between speed and quality.",f:["strike a balance","struck a balance","striking a balance","strikes a balance","strike the right balance"]},
+{t:"bear in mind",m:3,s:"Verb + noun",b:"remember and consider",d:"to remember and consider something when deciding",n:"A gentle reminder, often followed by 'that'.",p:"/beər ɪn maɪnd/",e:"Bear in mind that the office closes at four.",c:["bear in mind that","bear something in mind"],bs:"Remember that the shops close early on Sundays.",cs:"Bear in mind that the shops close early on Sundays.",f:["bear in mind","bore in mind","bearing in mind","bear that in mind","bear it in mind"]},
+{t:"draw a conclusion",m:3,s:"Verb + noun",b:"decide what something means",d:"to decide something after considering the evidence",n:"Reasoning, formal register. Conclusions are drawn 'from' evidence.",p:"/drɔː ə kənˈkluːʒn/",e:"It is too early to draw a conclusion from the results.",c:["draw a conclusion from","draw conclusions"],bs:"It is too early to decide what the results mean.",cs:"It is too early to draw a conclusion from the results.",f:["draw a conclusion","draw conclusions","drew a conclusion","drawn a conclusion","draw any conclusions","draw any conclusion"]},
+
+/* ---------- Phrasal verbs with manner ---------- */
+{t:"breeze through",m:4,s:"Speed & ease",b:"do something easily",d:"to complete something with no difficulty at all",n:"Effortless, sometimes to the surprise of others: exams, interviews, tasks.",p:"/briːz θruː/",e:"She breezed through the interview.",c:["breeze through an exam","breeze through an interview"],bs:"She passed the driving test very easily.",cs:"She breezed through the driving test.",f:["breezed through","breezes through","breezing through"]},
+{t:"plough through",m:4,s:"Speed & ease",b:"do something slowly and with effort",d:"to work slowly through something long and tedious",n:"Effort, boredom and persistence: reports, paperwork, long books.",p:"/plaʊ θruː/",e:"I ploughed through the 300-page report over the weekend.",c:["plough through a report","plough through paperwork"],bs:"He read the long contract slowly and with great effort.",cs:"He ploughed through the long contract.",f:["ploughed through","plowed through","ploughing through","plow through","ploughs through"]},
+{t:"dash off",m:4,s:"Speed & ease",b:"write something very quickly",d:"to write or produce something very quickly and without much care",n:"Haste and low effort: notes, emails, replies.",p:"/dæʃ ɒf/",e:"She dashed off a quick reply and ran for the bus.",c:["dash off a note","dash off an email","dash off a reply"],bs:"She wrote a quick reply and ran to catch the bus.",cs:"She dashed off a reply and ran to catch the bus.",f:["dashed off","dashes off","dashing off"]},
+{t:"rattle off",m:4,s:"Speed & ease",b:"say a list quickly from memory",d:"to say or recite something rapidly and easily",n:"Fluent and practised: names, numbers, facts.",p:"/ˈrætl ɒf/",e:"He rattled off all fifty state capitals in a minute.",c:["rattle off a list","rattle off names","rattle off figures"],bs:"He said all fifty state capitals quickly from memory.",cs:"He rattled off all fifty state capitals.",f:["rattled off","rattles off","rattling off"]},
+{t:"plod along",m:4,s:"Speed & ease",b:"continue slowly and steadily",d:"to move or progress slowly and steadily, without excitement",n:"Dull but persistent: projects, careers, economies.",p:"/plɒd əˈlɒŋ/",e:"The project plodded along for years without much progress.",c:["plod along with a project"],bs:"The project continued slowly and steadily without much progress.",cs:"The project plodded along without much progress.",f:["plodded along","plods along","plodding along"]},
+{t:"barge in",m:4,s:"Force & intrusion",b:"enter rudely and suddenly",d:"to enter a room or conversation rudely and abruptly",n:"Rudeness and lack of awareness. Often 'barge in on' someone.",p:"/bɑːdʒ ɪn/",e:"He barged in on the meeting without knocking.",c:["barge in on somebody","barge into a room"],bs:"He entered the meeting rudely without knocking.",cs:"He barged in on the meeting without knocking.",f:["barged in","barges in","barging in","barged into","barge into"]},
+{t:"storm out",m:4,s:"Force & intrusion",b:"leave angrily",d:"to leave a place suddenly and angrily",n:"Dramatic, visible anger.",p:"/stɔːm aʊt/",e:"She stormed out of the meeting in tears.",c:["storm out of a meeting","storm out of the room"],bs:"She left the room angrily in the middle of the argument.",cs:"She stormed out in the middle of the argument.",f:["stormed out","storms out","storming out"]},
+{t:"butt in",m:4,s:"Force & intrusion",b:"interrupt rudely",d:"to interrupt a conversation rudely",n:"Informal; the speaker is annoyed, or apologising for doing it.",p:"/bʌt ɪn/",e:"Sorry to butt in, but is that seat taken?",c:["butt in on a conversation"],bs:"Sorry to interrupt rudely, but is that seat taken?",cs:"Sorry to butt in, but is that seat taken?",f:["butt in","butted in","butts in","butting in"]},
+{t:"lash out",m:4,s:"Force & intrusion",b:"attack suddenly, with words or blows",d:"to suddenly attack someone with words or physically",n:"Uncontrolled anger, often at the wrong target.",p:"/læʃ aʊt/",e:"She lashed out at her critics online.",c:["lash out at somebody"],bs:"She suddenly attacked her critics angrily on social media.",cs:"She lashed out at her critics on social media.",f:["lashed out","lashes out","lashing out"]},
+{t:"wolf down",m:4,s:"Force & intrusion",b:"eat very fast",d:"to eat something very quickly and greedily",n:"Hunger and hurry. Informal.",p:"/wʊlf daʊn/",e:"He wolfed down his lunch at his desk.",c:["wolf down a sandwich","wolf down breakfast"],bs:"He ate his breakfast very fast and left.",cs:"He wolfed down his breakfast and left.",f:["wolfed down","wolfs down","wolfing down"]},
+{t:"slip away",m:4,s:"Avoidance & withdrawal",b:"leave quietly without being noticed",d:"to leave quietly without anyone noticing",n:"Discretion or avoidance. Also used of time and opportunities that slip away.",p:"/slɪp əˈweɪ/",e:"He slipped away before the speeches started.",c:["slip away from a party","slip away unnoticed"],bs:"She left the party quietly without anyone noticing.",cs:"She slipped away from the party unnoticed.",f:["slipped away","slips away","slipping away"]},
+{t:"shy away from",m:4,s:"Avoidance & withdrawal",b:"avoid something because of nervousness",d:"to avoid something through nervousness or lack of confidence",n:"Reluctance and timidity: confrontation, responsibility, the spotlight.",p:"/ʃaɪ əˈweɪ frɒm/",e:"Politicians tend to shy away from that question.",c:["shy away from confrontation","shy away from responsibility"],bs:"He avoids difficult conversations because they make him nervous.",cs:"He shies away from difficult conversations.",f:["shies away from","shied away from","shying away from","shy away from"]}
+];
+
+/* =========================================================
+   STORAGE (falls back to memory if browser storage is blocked)
+   ========================================================= */
+const KEY = "sharpen-c1-v1";
+let mem = null;
+function load(){
+  try{ const raw = localStorage.getItem(KEY); if(raw) return JSON.parse(raw); }catch(e){}
+  return mem || null;
+}
+function save(){
+  mem = state;
+  try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){}
+}
+const today = () => new Date().toISOString().slice(0,10);
+function daysAgo(dateStr){
+  const a = new Date(dateStr+"T00:00:00"), b = new Date(today()+"T00:00:00");
+  return Math.round((b-a)/86400000);
+}
+
+let state = load() || {
+  items:{},           // term -> {box, due, seen, right, wrong}
+  streak:0, lastGoalDay:null, dayPoints:0, dayDate:today(),
+  goal:30, voice:"en-GB", totalPoints:0
+};
+if(state.dayDate !== today()){
+  // a new day: keep or reset streak
+  if(state.lastGoalDay && daysAgo(state.lastGoalDay) > 1) state.streak = 0;
+  state.dayDate = today(); state.dayPoints = 0;
+}
+save();
+
+const INTERVALS = [0,1,3,7,14,30]; // days until next review, by box
+function it(term){ return state.items[term] || (state.items[term] = {box:0,due:today(),seen:0,right:0,wrong:0}); }
+function mastery(term){ const s = state.items[term]; return s ? Math.min(s.box,4)/4 : 0; }
+function isDue(term){ const s = state.items[term]; return s && s.seen>0 && s.due <= today(); }
+function grade(term, ok){
+  const s = it(term); s.seen++;
+  if(ok){ s.right++; s.box = Math.min(s.box+1, 5); }
+  else { s.wrong++; s.box = Math.max(s.box-1, 0); }
+  const d = new Date(); d.setDate(d.getDate()+INTERVALS[s.box]);
+  s.due = d.toISOString().slice(0,10);
+}
+function addPoints(n){
+  state.totalPoints += n; state.dayPoints += n;
+  if(state.dayPoints >= state.goal && state.lastGoalDay !== today()){
+    if(state.lastGoalDay && daysAgo(state.lastGoalDay) === 1) state.streak++;
+    else state.streak = 1;
+    state.lastGoalDay = today();
+    toast(`Daily target reached. Streak: ${state.streak} day${state.streak===1?"":"s"}`);
+  }
+  save();
+}
+
+/* =========================================================
+   HELPERS
+   ========================================================= */
+const $ = s => document.querySelector(s);
+const app = $("#app");
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const norm = s => s.toLowerCase().replace(/[\u2018\u2019]/g,"'").replace(/[^a-z0-9' ]+/g," ").replace(/\s+/g," ").trim();
+const shuffle = a => { a = a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; };
+const forms = item => [item.t, ...(item.f||[])].map(norm);
+function contains(answer, item){ const a = " "+norm(answer)+" "; return forms(item).some(f => a.includes(" "+f+" ")); }
+function lev(a,b){ const m=a.length,n=b.length; const d=Array.from({length:m+1},(_,i)=>[i,...Array(n).fill(0)]); for(let j=1;j<=n;j++)d[0][j]=j; for(let i=1;i<=m;i++)for(let j=1;j<=n;j++)d[i][j]=Math.min(d[i-1][j]+1,d[i][j-1]+1,d[i-1][j-1]+(a[i-1]===b[j-1]?0:1)); return d[m][n]; }
+function modPct(m){ const items = m==="all" ? DB : DB.filter(x=>x.m===m); return Math.round(items.reduce((s,x)=>s+mastery(x.t),0)/items.length*100); }
+function toast(msg){ const t=$("#toast"); t.textContent=msg; t.classList.add("show"); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove("show"),2600); }
+
+/* text-to-speech */
+let voices = [];
+function loadVoices(){ voices = window.speechSynthesis ? speechSynthesis.getVoices() : []; }
+if(window.speechSynthesis){ loadVoices(); speechSynthesis.onvoiceschanged = loadVoices; }
+function speak(text){
+  if(!window.speechSynthesis){ toast("Speech is not supported in this browser"); return; }
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = state.voice; u.rate = 0.9;
+  const v = voices.find(v=>v.lang.replace("_","-")===state.voice) || voices.find(v=>v.lang.startsWith("en"));
+  if(v) u.voice = v;
+  speechSynthesis.speak(u);
+}
+window.speak = speak;
+
+const ICON = {
+  flame:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c4.4 0 7-2.9 7-7 0-3.5-2.5-5.5-3.6-7.2-.5 1.9-1.6 2.9-2.6 3.2C13.3 8.7 13 6 10.5 3 9.2 6.6 5 8.5 5 15c0 4.1 2.6 7 7 7z"/></svg>',
+  sound:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg>',
+  back:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>',
+  close:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>',
+  gear:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>',
+  check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>',
+  x:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>'
+};
+const tagHtml = (item, extra="") => `<span class="tag ${extra}" style="background:${MODULES[item.m].hue}">${esc(MODULES[item.m].short)} · ${esc(item.s)}</span>`;
+
+/* =========================================================
+   SCREENS
+   ========================================================= */
+let view = {name:"home"};
+let sel = {m:"all", sub:"all", mode:"mixed"};
+
+function go(v){ view = v; hideFeedback(); window.scrollTo(0,0); render(); }
+
+function render(){
+  ({home:renderHome, module:renderModule, flash:renderFlash, practice:renderPractice, summary:renderSummary, settings:renderSettings})[view.name]();
+}
+
+/* ---------- Home ---------- */
+function renderHome(){
+  const due = DB.filter(x=>isDue(x.t)).length;
+  const pct = Math.min(1, state.dayPoints/state.goal);
+  const circ = 2*Math.PI*36;
+  app.innerHTML = `
+  <div class="screen">
+    <div class="topbar">
+      <div><h1>Sharpen</h1><div class="sub">C1 vocabulary trainer</div></div>
+      <button class="icon-btn" aria-label="Settings" onclick="go({name:'settings'})">${ICON.gear}</button>
+    </div>
+    <div class="today">
+      <div>
+        <div class="big" style="color:var(--sun)">${ICON.flame}${state.streak}</div>
+        <div class="lbl">day streak (days in a row you hit your target)</div>
+        <div class="lbl" style="margin-top:10px;color:#fff">${state.dayPoints} of ${state.goal} points today</div>
+      </div>
+      <div class="ring">
+        <svg viewBox="0 0 84 84"><circle class="c1" cx="42" cy="42" r="36"/><circle class="c2" cx="42" cy="42" r="36" stroke-dasharray="${circ}" stroke-dashoffset="${circ*(1-pct)}"/></svg>
+        <div class="txt">${Math.round(pct*100)}%<small>today</small></div>
+      </div>
+    </div>
+    ${due ? `<button class="btn sun due-btn" onclick="startDue()">Review ${due} word${due===1?"":"s"} due today</button>` : `<button class="btn ghost due-btn" onclick="startQuick()">Quick practice: 10 mixed questions</button>`}
+    <h2 class="sec">Study by module</h2>
+    <div class="mods">
+      <button class="mod all" onclick="openModule('all')">
+        <div class="badge">C1</div>
+        <div><div class="name">All C1 vocabulary</div><div class="meta">${DB.length} words and expressions</div>
+          <div class="bar-track"><div class="bar-fill" style="width:${modPct("all")}%"></div></div></div>
+        <div class="pct">${modPct("all")}%</div>
+      </button>
+      ${MODULES.map((m,i)=>`
+      <button class="mod" onclick="openModule(${i})">
+        <div class="badge" style="background:${m.hue}">${["Vb","Adj","N","Co","Ph"][i]}</div>
+        <div><div class="name">${esc(m.name)}</div><div class="meta">${DB.filter(x=>x.m===i).length} items · ${m.subs.length} sub-categories</div>
+          <div class="bar-track"><div class="bar-fill" style="width:${modPct(i)}%;background:${m.hue}"></div></div></div>
+        <div class="pct">${modPct(i)}%</div>
+      </button>`).join("")}
+    </div>
+  </div>`;
+}
+window.openModule = m => { sel.m = m; sel.sub="all"; go({name:"module"}); };
+window.startDue = () => { const items = DB.filter(x=>isDue(x.t)); startPractice(items, "mixed"); };
+window.startQuick = () => startPractice(pickItems(DB, 10), "mixed");
+
+/* ---------- Module screen ---------- */
+function renderModule(){
+  const m = sel.m; const mod = m==="all" ? null : MODULES[m];
+  const subs = mod ? mod.subs : [];
+  const pool = itemsFor(m, sel.sub);
+  const modes = [["mixed","Mixed","All three exercise types"],["convert","Rewrite sentences","Turn a basic sentence into C1"],["recall","Type the word","Read the definition, type the term"],["choose","Choose the word","Fill the gap from four options"]];
+  app.innerHTML = `
+  <div class="screen">
+    <div class="topbar">
+      <button class="icon-btn" aria-label="Back" onclick="go({name:'home'})">${ICON.back}</button>
+      <div style="flex:1"><h1 style="font-size:21px">${mod ? esc(mod.name) : "All C1 vocabulary"}</h1><div class="sub">${pool.length} items · ${modPct(m)}% mastered</div></div>
+    </div>
+    ${subs.length ? `<div class="chips">
+      <button class="chip ${sel.sub==="all"?"on":""}" onclick="setSub('all')">All</button>
+      ${subs.map(s=>`<button class="chip ${sel.sub===s?"on":""}" onclick="setSub('${esc(s).replace(/'/g,"\\'")}')">${esc(s)}</button>`).join("")}
+    </div>` : ""}
+    <h2 class="sec">Practice type</h2>
+    <div class="mode-grid">
+      ${modes.map(([k,l,d])=>`<button class="mode ${sel.mode===k?"on":""}" onclick="setMode('${k}')">${l}<small>${d}</small></button>`).join("")}
+    </div>
+    <div class="stack">
+      <button class="btn" onclick="startPractice(pickItems(itemsFor(sel.m, sel.sub), 10), sel.mode)">Start practice (10 questions)</button>
+      <button class="btn ghost" onclick="startFlash()">Study flashcards</button>
+    </div>
+    <h2 class="sec">Words in this set</h2>
+    <div class="wordlist">
+      ${pool.map(x=>`<button class="wrow" onclick="startFlash('${esc(x.t).replace(/'/g,"\\'")}')"><span>${esc(x.t)}<small>${esc(x.s)}</small></span><span class="dots">${[1,2,3,4].map(i=>`<span class="dot ${mastery(x.t)*4>=i?"on":""}"></span>`).join("")}</span></button>`).join("")}
+    </div>
+  </div>`;
+}
+window.setSub = s => { sel.sub = s; render(); };
+window.setMode = k => { sel.mode = k; render(); };
+window.itemsFor = (m, sub) => DB.filter(x => (m==="all" || x.m===m) && (sub==="all" || x.s===sub));
+window.pickItems = (pool, n) => {
+  const due = shuffle(pool.filter(x=>isDue(x.t)));
+  const fresh = shuffle(pool.filter(x=>!state.items[x.t] || state.items[x.t].seen===0));
+  const rest = shuffle(pool.filter(x=>!due.includes(x)&&!fresh.includes(x)));
+  return [...due, ...fresh, ...rest].slice(0, Math.min(n, pool.length));
+};
+
+/* ---------- Flashcards ---------- */
+let fl = null;
+window.startFlash = (startTerm) => {
+  let pool = itemsFor(sel.m, sel.sub);
+  if(startTerm){ const i = pool.findIndex(x=>x.t===startTerm); pool = [...pool.slice(i), ...pool.slice(0,i)]; }
+  else pool = pickItems(pool, pool.length);
+  fl = {items:pool, i:0, flipped:false, mastered:0, practice:0};
+  go({name:"flash"});
+};
+function renderFlash(){
+  const item = fl.items[fl.i];
+  if(!item){ go({name:"summary", kind:"flash"}); return; }
+  app.innerHTML = `
+  <div class="screen">
+    <div class="topbar">
+      <button class="icon-btn" aria-label="Close" onclick="go({name:'module'})">${ICON.close}</button>
+      <div class="bar-track"><div class="bar-fill cobalt" style="width:${fl.i/fl.items.length*100}%"></div></div>
+      <div class="sub">${fl.i+1}/${fl.items.length}</div>
+    </div>
+    <div class="flash-wrap">
+      <div class="flash ${fl.flipped?"flipped":""}" id="flash" onclick="flip()" role="button" tabindex="0" aria-label="Flashcard, tap to flip">
+        <div class="face front">
+          ${tagHtml(item)}
+          <div class="front-body">
+            <div class="term">${esc(item.t)}</div>
+            <div class="ipa">${esc(item.p)}</div>
+            <button class="speak" onclick="event.stopPropagation();speak('${esc(item.t).replace(/'/g,"\\'")}')">${ICON.sound} Listen</button>
+          </div>
+          <div class="hint">Tap the card to see the meaning</div>
+        </div>
+        <div class="face back">
+          ${tagHtml(item)}
+          <div class="swap"><div class="from">${esc(item.b)}</div><div class="arrow">becomes</div><div class="to">${esc(item.t)}</div></div>
+          <div class="def">${esc(item.d)}</div>
+          <div class="block"><div class="k">Nuance</div><div class="v">${esc(item.n)}</div></div>
+          <div class="block"><div class="k">Example</div><div class="v"><em>${esc(item.e)}</em> <button class="speak" style="padding:4px 9px;font-size:12px;vertical-align:middle" onclick="event.stopPropagation();speak('${esc(item.e).replace(/'/g,"\\'")}')">${ICON.sound}</button></div></div>
+          <div class="block"><div class="k">Collocations</div><div class="colls">${item.c.map(c=>`<span class="coll">${esc(c)}</span>`).join("")}</div></div>
+        </div>
+      </div>
+    </div>
+    ${fl.flipped ? `<div class="assess">
+      <button class="btn coral" onclick="assess(false)">Need practice</button>
+      <button class="btn mint" onclick="assess(true)">Mastered</button>
+    </div>` : `<button class="btn ghost" onclick="flip()">Show meaning</button>`}
+  </div>`;
+}
+window.flip = () => { fl.flipped = !fl.flipped; renderFlash(); };
+window.assess = ok => {
+  const item = fl.items[fl.i];
+  grade(item.t, ok); addPoints(ok?4:2);
+  if(ok) fl.mastered++; else fl.practice++;
+  fl.i++; fl.flipped=false; renderFlash();
+};
+
+/* ---------- Practice ---------- */
+let pr = null;
+window.startPractice = (items, mode) => {
+  if(!items.length){ toast("No words in this set yet"); return; }
+  const types = mode==="mixed" ? ["convert","recall","choose"] : [mode];
+  const qs = items.map((item,i)=>makeQ(item, types[i%types.length]));
+  pr = {qs, i:0, right:0, wrong:0, points:0, results:[], answered:false, choice:null};
+  go({name:"practice"});
+};
+function makeQ(item, type){
+  const q = {item, type};
+  // find the form of the term actually used in the model sentence (for highlighting and the gap)
+  const fs = [item.t, ...(item.f||[])].sort((a,b)=>b.length-a.length);
+  q.used = item.t;
+  for(const f of fs){ if(new RegExp("\\b"+f.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+"\\b","i").test(item.cs)){ q.used=f; break; } }
+  if(type==="choose"){
+    const pool = DB.filter(x=>x!==item && x.m===item.m && !(item.x||[]).includes(x.t) && !(x.x||[]).includes(item.t));
+    const same = shuffle(pool.filter(x=>x.s===item.s)), other = shuffle(pool.filter(x=>x.s!==item.s));
+    const ds = [...same, ...other].slice(0,3);
+    q.options = shuffle([item, ...ds]);
+    q.gap = item.cs.replace(new RegExp("\\b"+q.used.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+"\\b","i"),"____");
+  }
+  return q;
+}
+function renderPractice(){
+  const q = pr.qs[pr.i];
+  if(!q){ go({name:"summary", kind:"practice"}); return; }
+  const item = q.item;
+  let body = "";
+  if(q.type==="convert"){
+    body = `<div class="q-type">${tagHtml(item)}<span>Rewrite the sentence</span></div>
+      <div class="q-prompt">Say the same thing in C1 English, using the more precise word or expression.</div>
+      <div class="q-basic">${esc(item.bs)}</div>
+      <textarea class="field" id="ans" rows="3" placeholder="Type your C1 version here" autocomplete="off" autocapitalize="sentences"></textarea>
+      <div class="helpline"><span class="pill">Hint: starts with "${esc(item.t[0])}"</span><span class="pill">Replaces: ${esc(item.b)}</span></div>`;
+  } else if(q.type==="recall"){
+    body = `<div class="q-type">${tagHtml(item)}<span>Type the word</span></div>
+      <div class="q-prompt">Which C1 word or expression is this?</div>
+      <div class="block"><div class="k">Definition</div><div class="v">${esc(item.d)}</div></div>
+      <div class="block"><div class="k">Nuance</div><div class="v">${esc(item.n)}</div></div>
+      <div class="block"><div class="k">Basic equivalent</div><div class="v">${esc(item.b)}</div></div>
+      <input class="field" id="ans" placeholder="Type the exact word" autocomplete="off" autocapitalize="none" spellcheck="false">
+      <div class="helpline"><span class="pill">${item.t.split(" ").length} word${item.t.split(" ").length>1?"s":""}</span><span class="pill">${esc(item.t.length)} letters incl. spaces</span></div>`;
+  } else {
+    body = `<div class="q-type">${tagHtml(item)}<span>Choose the word</span></div>
+      <div class="q-prompt">Fill the gap with the word whose nuance fits best.</div>
+      <div class="q-basic">${esc(q.gap).replace("____",'<span class="gap">&nbsp;</span>')}</div>
+      <div class="opts">${q.options.map((o,i)=>`<button class="opt ${pr.choice===i?"sel":""}" onclick="choose(${i})"><span class="key">${i+1}</span>${esc(o.t)}</button>`).join("")}</div>`;
+  }
+  app.innerHTML = `
+  <div class="screen">
+    <div class="topbar">
+      <button class="icon-btn" aria-label="Close" onclick="go({name:'module'})">${ICON.close}</button>
+      <div class="bar-track"><div class="bar-fill" style="width:${pr.i/pr.qs.length*100}%"></div></div>
+      <div class="sub">${pr.i+1}/${pr.qs.length}</div>
+    </div>
+    <div class="q-card">${body}</div>
+  </div>
+  <div class="dock"><div class="dock-in"><button class="btn" id="checkBtn" onclick="check()" ${q.type==="choose"&&pr.choice===null?"disabled":""}>Check</button></div></div>`;
+  const a = $("#ans"); if(a){ a.focus(); a.addEventListener("keydown", e=>{ if(e.key==="Enter"){ e.preventDefault(); check(); } }); }
+}
+window.choose = i => { if(pr.answered) return; pr.choice = i; renderPractice(); };
+window.check = () => {
+  if(pr.answered) return;
+  const q = pr.qs[pr.i], item = q.item;
+  let ok=false, title="", html="";
+  const model = `<div class="model">${esc(item.cs).replace(new RegExp(esc(q.used||item.t).replace(/[.*+?^${}()|[\]\\]/g,"\\$&"),"i"), m=>`<b>${m}</b>`)}</div>`;
+  if(q.type==="convert"){
+    const ans = $("#ans").value; if(!norm(ans)) { toast("Type your sentence first"); return; }
+    ok = contains(ans, item);
+    if(ok){ title="Well put"; html=`<p>You used <b>${esc(item.t)}</b> correctly. ${esc(item.n)}</p>${model}`; }
+    else {
+      const other = DB.find(x=>x!==item && contains(ans, x));
+      html = other
+        ? `<p>You used <b>${esc(other.t)}</b>. That means ${esc(other.b)}, and its nuance is: ${esc(other.n)}</p><p>The sentence needs <b>${esc(item.t)}</b>: ${esc(item.n)}</p>${model}`
+        : `<p>The word you are looking for is <b>${esc(item.t)}</b> ${esc(item.p)}: ${esc(item.d)}. ${esc(item.n)}</p>${model}`;
+      title="Not quite";
+    }
+    $("#ans").classList.add(ok?"ok":"bad");
+  } else if(q.type==="recall"){
+    const ans = norm($("#ans").value); if(!ans){ toast("Type the word first"); return; }
+    ok = forms(item).includes(ans);
+    const close = !ok && lev(ans, norm(item.t)) <= 2;
+    if(ok){ title="Correct"; html=`<p><b>${esc(item.t)}</b> ${esc(item.p)}. ${esc(item.n)}</p>${model}`; }
+    else if(close){ title="Almost: check the spelling"; html=`<p>The correct spelling is <b>${esc(item.t)}</b> ${esc(item.p)}. You wrote "${esc($("#ans").value)}".</p>${model}`; }
+    else { title="Not quite"; const other = DB.find(x=>x!==item && forms(x).includes(ans)); html = (other?`<p><b>${esc(other.t)}</b> means ${esc(other.b)}: ${esc(other.n)}</p>`:"") + `<p>The answer is <b>${esc(item.t)}</b> ${esc(item.p)}. ${esc(item.n)}</p>${model}`; }
+    $("#ans").classList.add(ok?"ok":"bad");
+  } else {
+    const chosen = q.options[pr.choice]; ok = chosen===item;
+    document.querySelectorAll(".opt").forEach((el,i)=>{ el.disabled=true; if(q.options[i]===item) el.classList.add("ok"); else if(i===pr.choice) el.classList.add("bad"); });
+    if(ok){ title="Correct"; html=`<p><b>${esc(item.t)}</b> fits because: ${esc(item.n)}</p>`; }
+    else { title="Not quite"; html=`<p><b>${esc(chosen.t)}</b> means ${esc(chosen.b)}. ${esc(chosen.n)}</p><p>Here the sentence needs <b>${esc(item.t)}</b>: ${esc(item.n)}</p>${model}`; }
+  }
+  pr.answered = true;
+  grade(item.t, ok);
+  const pts = ok ? 10 : 2; pr.points += pts; addPoints(pts);
+  if(ok) pr.right++; else pr.wrong++;
+  pr.results.push({item, ok, type:q.type});
+  $("#checkBtn").disabled = true;
+  showFeedback(ok, title, html);
+};
+window.next = () => { hideFeedback(); pr.i++; pr.answered=false; pr.choice=null; window.scrollTo(0,0); renderPractice(); };
+
+function showFeedback(ok, title, html){
+  const fb = $("#fb"); fb.className = "feedback show "+(ok?"ok":"bad");
+  $("#fb-in").innerHTML = `<div class="fb-title">${ok?ICON.check:ICON.x}${esc(title)}</div><div class="fb-body">${html}</div>
+    <div style="display:flex;gap:10px"><button class="btn ghost sm" onclick="speak('${esc(pr.qs[pr.i].item.t).replace(/'/g,"\\'")}')" aria-label="Listen">${ICON.sound}</button><button class="btn" onclick="next()">Continue</button></div>`;
+}
+function hideFeedback(){ const fb=$("#fb"); if(fb) fb.className="feedback"; }
+
+/* ---------- Summary ---------- */
+function renderSummary(){
+  const isP = view.kind==="practice";
+  const total = isP ? pr.qs.length : fl.items.length;
+  const right = isP ? pr.right : fl.mastered;
+  const pts = isP ? pr.points : (fl.mastered*4 + fl.practice*2);
+  const missed = isP ? pr.results.filter(r=>!r.ok) : [];
+  app.innerHTML = `
+  <div class="screen summary">
+    <div class="score">${Math.round(right/total*100)}%</div>
+    <div class="lbl">${isP ? "answered correctly" : "marked as mastered"}</div>
+    <div class="stats">
+      <div class="stat"><div class="n">+${pts}</div><div class="l">points</div></div>
+      <div class="stat"><div class="n">${right}/${total}</div><div class="l">${isP?"correct":"mastered"}</div></div>
+      <div class="stat"><div class="n" style="color:var(--sun-dk)">${state.streak}</div><div class="l">day streak</div></div>
+    </div>
+    ${missed.length ? `<h2 class="sec" style="text-align:left">Worth another look</h2><div class="review-list">${missed.map(r=>`<div class="wrow bad"><span>${esc(r.item.t)}<small>${esc(r.item.b)}</small></span></div>`).join("")}</div>` : (isP ? `<div class="empty">Every answer correct. These words will come back for review in a few days.</div>` : "")}
+    <div class="stack">
+      ${isP && missed.length ? `<button class="btn sun" onclick="startPractice(${JSON.stringify(missed.map(r=>r.item.t))}.map(t=>DB.find(x=>x.t===t)), 'mixed')">Practise the ${missed.length} you missed</button>` : ""}
+      <button class="btn" onclick="go({name:'home'})">Back to dashboard</button>
+    </div>
+  </div>`;
+}
+
+/* ---------- Settings ---------- */
+function renderSettings(){
+  app.innerHTML = `
+  <div class="screen">
+    <div class="topbar">
+      <button class="icon-btn" aria-label="Back" onclick="go({name:'home'})">${ICON.back}</button>
+      <div style="flex:1"><h1 style="font-size:22px">Settings</h1></div>
+    </div>
+    <div class="setrow"><div>Daily target<br><small style="color:var(--ink-3)">Points needed each day to keep your streak. A correct answer is 10 points.</small></div>
+      <div class="seg">${[20,30,50].map(g=>`<button class="${state.goal===g?"on":""}" onclick="setGoal(${g})">${g}</button>`).join("")}</div></div>
+    <div class="setrow"><div>Voice accent</div>
+      <div class="seg"><button class="${state.voice==="en-GB"?"on":""}" onclick="setVoice('en-GB')">UK</button><button class="${state.voice==="en-US"?"on":""}" onclick="setVoice('en-US')">US</button></div></div>
+    <div class="setrow"><div>Total points earned</div><b>${state.totalPoints}</b></div>
+    <div class="setrow"><div>Words started</div><b>${Object.values(state.items).filter(s=>s.seen>0).length} / ${DB.length}</b></div>
+    <div class="setrow" style="flex-direction:column;align-items:stretch;gap:8px"><div>Back up your progress<br><small style="color:var(--ink-3)">Export copies a code to your clipboard. Paste it into Import on any device to restore.</small></div>
+      <div style="display:flex;gap:8px"><button class="btn ghost sm" style="flex:1" onclick="exportProgress()">Export</button><button class="btn ghost sm" style="flex:1" onclick="importProgress()">Import</button></div></div>
+    <button class="btn ghost" style="color:var(--coral);margin-top:10px" onclick="resetAll()">Reset all progress</button>
+    <p style="color:var(--ink-3);font-size:13px;margin-top:16px">Progress is saved in this browser on this device. How review works: each word moves up a level when you get it right and down when you miss it. Higher levels come back less often (1, 3, 7, 14 then 30 days).</p>
+  </div>`;
+}
+window.setGoal = g => { state.goal=g; save(); render(); };
+window.setVoice = v => { state.voice=v; save(); render(); speak("Hello"); };
+window.exportProgress = async () => {
+  const code = btoa(unescape(encodeURIComponent(JSON.stringify(state))));
+  try{ await navigator.clipboard.writeText(code); toast("Progress code copied to clipboard"); }
+  catch(e){ prompt("Copy this code and keep it somewhere safe:", code); }
+};
+window.importProgress = () => {
+  const code = prompt("Paste your progress code:"); if(!code) return;
+  try{ const s = JSON.parse(decodeURIComponent(escape(atob(code.trim())))); if(!s.items) throw 0; state = s; save(); go({name:"home"}); toast("Progress restored"); }
+  catch(e){ toast("That code could not be read"); }
+};
+window.resetAll = () => { if(confirm("Delete all your progress on this device?")){ state.items={}; state.streak=0; state.lastGoalDay=null; state.dayPoints=0; state.totalPoints=0; save(); go({name:"home"}); toast("Progress reset"); } };
+
+window.go = go;
+render();
+if("serviceWorker" in navigator && location.protocol.startsWith("http")){ navigator.serviceWorker.register("sw.js").catch(()=>{}); }
+</script>
+</body>
+</html>
