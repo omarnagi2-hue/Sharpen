@@ -217,6 +217,36 @@ h2.sec{font-size:15px;color:var(--ink-3);font-weight:800;margin:14px 0 10px}
 .empty{text-align:center;color:var(--ink-3);padding:30px 10px;font-weight:700}
 
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+.intro{background:#fff;border:2px solid var(--line);border-radius:16px;padding:14px 16px;font-size:15.5px;line-height:1.55;color:var(--ink-2);margin-bottom:12px}
+.ask{background:var(--cobalt-tint);border-radius:14px;padding:12px 14px;font-size:14.5px;line-height:1.5;color:var(--cobalt);font-weight:800;margin-bottom:14px}
+.ask small{display:block;font-size:12px;color:var(--ink-3);font-weight:800;margin-bottom:3px;text-transform:uppercase;letter-spacing:.04em}
+.seg2{display:flex;background:var(--line);border-radius:12px;padding:3px;margin-bottom:12px}
+.seg2 button{flex:1;padding:9px;border-radius:10px;font-weight:800;font-size:14px;color:var(--ink-2)}
+.seg2 button.on{background:#fff;color:var(--ink);box-shadow:0 2px 0 var(--line-2)}
+.ladder{display:flex;flex-direction:column;gap:8px}
+.lrow{display:flex;gap:12px;align-items:center;background:#fff;border:2px solid var(--line);border-radius:14px;padding:11px 12px;text-align:left;width:100%}
+.lrow.cur{border-color:var(--cobalt);background:var(--cobalt-tint)}
+.lrow .lv{display:flex;flex-direction:column-reverse;gap:2px;width:14px;flex:none}
+.lrow .lv i{display:block;height:5px;border-radius:2px;background:var(--line)}
+.lrow .lv i.on{background:var(--cobalt)}
+.lrow .tx{flex:1;min-width:0}
+.lrow .tx b{display:block;font-size:16.5px;color:var(--ink)}
+.lrow .tx span{display:block;font-size:13.5px;color:var(--ink-3);font-weight:700;line-height:1.35;margin-top:2px}
+.lrow .dots{flex:none}
+.kind{margin:14px 0 8px;font-size:13.5px;font-weight:800;color:var(--ink-2);padding-left:2px}
+.kind small{display:block;color:var(--ink-3);font-weight:700;font-size:12.5px}
+.dom{display:flex;align-items:center;gap:8px;margin:18px 0 8px}
+.dom .sw{width:10px;height:10px;border-radius:3px}
+.crow{display:flex;justify-content:space-between;align-items:center;background:#fff;border:2px solid var(--line);border-radius:14px;padding:12px 14px;width:100%;text-align:left;font-weight:800;font-size:15.5px;box-shadow:0 3px 0 0 var(--line-2)}
+.crow small{display:block;color:var(--ink-3);font-size:12.5px;font-weight:700;margin-top:2px}
+.crow .pct{font-size:13px;color:var(--ink-3);margin-left:10px;flex:none}
+.wordhead{background:var(--ink);color:#fff;border-radius:18px;padding:18px;margin-bottom:12px}
+.wordhead .term{font-size:30px;font-weight:900;letter-spacing:-.02em}
+.wordhead .ipa{color:#B9C3E6;font-size:15px;margin:4px 0 10px}
+.wordhead .speak{background:rgba(255,255,255,.14);color:#fff}
+.sit{font-size:17px;line-height:1.5;padding:14px;border-radius:14px;background:var(--paper);border:2px solid var(--line);margin-bottom:12px}
+.sit small{display:block;font-size:12px;color:var(--ink-3);font-weight:800;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px}
 </style>
 </head>
 <body>
@@ -242,6 +272,262 @@ const MODULES = [
   {id:"phr",   name:"Phrasal verbs with manner", short:"Phrasal verbs", hue:"#E23D7A", subs:["Speed & ease","Force & intrusion","Avoidance & withdrawal"]}
 ];
 
+const CONCEPTS = [
+// ---------------- FEELINGS ----------------
+{id:"hate",dom:"Feelings",title:"Dislike and hatred",
+intro:"Plain 'hate' tells the listener nothing about what the hatred is made of. In English the strong words for dislike are separated less by strength than by kind: whether the feeling is disgust in the body, contempt in the mind, or bitterness about being treated unfairly. Choosing the word is choosing which of these you mean.",
+ask:"Is it about what they are like (loathe), about their worth (despise), or about what they did to you (resent)?",
+scale:"How strong",kinds:{disgust:"Disgust: a gut reaction, you cannot stand it",contempt:"Contempt: looking down, they are beneath you",unfair:"Injustice: bitterness about how you were treated"},
+w:[["loathe",5,"disgust","strong dislike that feels physical, like nausea"],["despise",4,"contempt","you have no respect for them at all"],["contempt",4,"contempt","the noun: treating someone as worthless"],["resent",3,"unfair","bitter about a specific unfair thing, usually silently"],["resentment",3,"unfair","the noun: bitterness that lasts and is rarely spoken"],["grudge",3,"unfair","resentment aimed at one person, kept for a long time"]]},
+
+{id:"anger",dom:"Feelings",title:"Anger, from irritated to livid",
+intro:"Anger has a clear strength scale in English, but it also splits by visibility: is it boiling inside you, or bursting out at someone? Several words describe the same heat with different behaviour attached.",
+ask:"How hot is it, and can other people see it?",
+scale:"How strong",kinds:{inside:"Kept inside: the anger is felt but controlled",out:"Let out: the anger is aimed at someone"},
+w:[["irritated",1,"inside","low-level annoyance at something small"],["exasperated",2,"inside","annoyance that has built up because nothing works"],["seethe",3,"inside","boiling with anger while staying silent"],["furious",4,"out","very angry, usually obvious"],["livid",5,"out","so angry it shows on your face"],["snap",2,"out","one sharp, irritated reply"],["lash out",4,"out","a sudden verbal or physical attack"],["outburst",4,"out","the noun: a sudden public explosion of feeling"],["tear into",4,"out","a sustained, savage telling-off"],["hit back",3,"out","a counter-attack after being criticised"]]},
+
+{id:"joy",dom:"Feelings",title:"Happiness and joy",
+intro:"Happiness words differ in how much they show, and in what they are pointed at. Some are quiet enjoyment, some are visible excitement, and some describe a happiness that says something about the person feeling it, good or bad.",
+ask:"Is the happiness inside you, visible on you, or about someone else's loss?",
+scale:"How strong",kinds:{quiet:"Quiet enjoyment: felt rather than shown",visible:"Visible joy: excitement other people can see",aimed:"Pointed at someone: pleasure about a person or their situation"},
+w:[["relish",2,"quiet","enjoying something slowly and fully"],["cherish",3,"quiet","loving and protecting something precious"],["thrilled",3,"visible","very pleased and excited, the polite strong word"],["elated",4,"visible","lifted up, often after achieving something"],["ecstatic",5,"visible","overwhelming joy, the top of the scale"],["marvel",3,"visible","wonder and admiration at something impressive"],["gush",3,"visible","over-the-top praise that may sound insincere"],["gloat",3,"aimed","smug pleasure at your win or someone's loss"],["smug",2,"aimed","too pleased with yourself, annoying to others"]]},
+
+{id:"sad",dom:"Feelings",title:"Sadness and loss",
+intro:"English separates sadness by cause and by behaviour. Some words belong to bereavement, some to disappointment, some to a mood that shows in how you sit and speak. The strongest words describe being unable to function.",
+ask:"Is it a loss, a disappointment, or a mood? And is the person still functioning?",
+scale:"How strong",kinds:{loss:"Loss: death, endings, absence",disappoint:"Disappointment: something hoped for did not happen",mood:"Mood: dark, silent, self-absorbed"},
+w:[["dismay",1,"disappoint","unhappy surprise, 'to my dismay'"],["gutted",2,"disappoint","bitterly disappointed, UK informal"],["pine",3,"loss","quietly missing someone or somewhere for a long time"],["grieve",4,"loss","the process of sorrow after a death"],["heartbroken",4,"loss","crushed by the end of a relationship or a loss"],["devastated",5,"loss","shocked and destroyed by terrible news"],["distraught",5,"loss","so upset you cannot think or act"],["sulk",2,"mood","silent, childish bad temper after not getting your way"],["brood",3,"mood","turning something dark over and over in your mind"]]},
+
+{id:"fear",dom:"Feelings",title:"Fear and worry",
+intro:"Worry and fear run on one scale from a vague unease to being frozen with terror. The kind matters too: worry about the future, worry about a choice, or fear of something present and immediate.",
+ask:"Is it a future you are dreading, a decision you cannot make, or a danger in front of you?",
+scale:"How strong",kinds:{future:"About the future: something bad may come",choice:"About a decision: torn between options",now:"Immediate: fear of something present"},
+w:[["unease",1,"future","a vague sense that something is wrong"],["apprehensive",1,"future","mildly worried about what is coming"],["anxious",2,"future","ongoing worry and nervousness"],["fret",2,"future","worrying visibly about small things"],["agonise",3,"choice","painful, prolonged indecision"],["dread",3,"future","strong fear of something you know is coming"],["terrified",4,"now","extremely afraid"],["petrified",5,"now","so afraid you cannot move"],["bolt",4,"now","the action: run away suddenly in fear"],["flee",4,"now","the action: escape from real danger"]]},
+
+{id:"confused",dom:"Feelings",title:"Confusion and astonishment",
+intro:"Not understanding and being amazed share a family of words because both stop you in your tracks. They differ in whether the cause is a puzzle you cannot solve, a situation that overwhelms you, or something so impressive it silences you.",
+ask:"Is it a puzzle, an overload, or wonder?",
+scale:"How strong",kinds:{puzzle:"Puzzle: cannot work it out",overload:"Overload: too much, too new",wonder:"Wonder: amazed and impressed"},
+w:[["blink",1,"overload","a small sign of surprise or confusion"],["baffled",3,"puzzle","totally unable to explain something"],["bewildered",3,"overload","lost and confused in a new situation"],["exclaim",2,"wonder","a sudden cry of surprise or delight"],["gape",4,"wonder","staring with your mouth open"],["marvel",3,"wonder","filled with admiration"],["awe",5,"wonder","respect mixed with wonder, even fear"],["behold",4,"wonder","see something remarkable, literary"]]},
+
+{id:"shame",dom:"Feelings",title:"Embarrassment and guilt",
+intro:"Embarrassment is about how you look to others; guilt is about what you did. The words also differ in whether the feeling is shown in your body, said out loud, or felt afterwards.",
+ask:"Is it about being seen (embarrassment) or about having done wrong (guilt)?",
+scale:"How strong",kinds:{seen:"Being seen: social embarrassment",wrong:"Having done wrong: guilt and regret"},
+w:[["cringe",2,"seen","a physical wince of embarrassment"],["mortified",4,"seen","so embarrassed you want to disappear"],["mumble",1,"seen","speaking unclearly from shyness or embarrassment"],["stammer",2,"seen","nervous, broken speech"],["remorse",4,"wrong","deep regret for a wrong you committed"],["agonise",3,"wrong","tormenting yourself over a choice"]]},
+
+{id:"tired",dom:"Feelings",title:"Tiredness",
+intro:"Tiredness words separate body from spirit. Some describe physical exhaustion, some describe being emotionally emptied, and some describe being fed up with something that goes on too long.",
+ask:"Is the body worn out, the energy emptied, or the patience gone?",
+scale:"How strong",kinds:{body:"Physical: the body is worn out",empty:"Emptied: no energy or feeling left",fedup:"Fed up: worn down by something tedious"},
+w:[["weary",2,"fedup","tired and slightly fed up, 'weary of'"],["exhausted",4,"body","completely worn out physically"],["drained",5,"empty","emotionally and physically emptied"],["trudge",3,"body","the movement: heavy, tired walking"],["plod along",2,"fedup","moving or working slowly without energy"],["drag on",2,"fedup","of time: continuing far too long"]]},
+
+{id:"indiff",dom:"Feelings",title:"Not caring and dismissing",
+intro:"Indifference has its own vocabulary, from the neutral absence of interest to the active gesture of brushing something away. The words differ in whether the not-caring is an inner state or something you do to another person.",
+ask:"Is it a state you are in, or a thing you do to someone?",
+scale:"How dismissive",kinds:{state:"A state: no interest",act:"An act: pushing something away"},
+w:[["indifferent",2,"state","having no interest either way"],["shrug off",2,"act","treating something as unimportant, often with resilience"],["brush off",3,"act","dismissing a person or concern casually"],["wave away",3,"act","dismissing with a hand gesture"],["take something for granted",2,"state","failing to appreciate what you have"],["smug",2,"state","self-satisfied, unbothered by others"]]},
+
+{id:"wanting",dom:"Feelings",title:"Wanting and appreciating",
+intro:"Desire and appreciation range from hunger to reverence. The distinction is between wanting what you do not have and valuing what you do.",
+ask:"Do you lack it (yearn) or hold it (cherish)?",
+scale:"How intense",kinds:{lack:"Wanting: it is absent",hold:"Valuing: it is present"},
+w:[["yearn",4,"lack","deep longing for something out of reach"],["pine",3,"lack","quiet, sad missing of someone absent"],["ravenous",5,"lack","extremely hungry"],["relish",3,"hold","enjoying something fully"],["cherish",4,"hold","holding something dear and protecting it"],["seize the opportunity",4,"lack","grabbing a chance before it goes"]]},
+
+// ---------------- SPEAKING ----------------
+{id:"quiet",dom:"Speaking",title:"Speaking quietly",
+intro:"Quiet speech is not one thing. English marks why the voice is low: secrecy, tenderness, shyness, or suppressed anger. The volume is similar; the emotion behind it is what the word tells you.",
+ask:"Why is the voice low: secret, gentle, shy, or angry?",
+scale:"How clear",kinds:{secret:"Secret or intimate",gentle:"Gentle and soothing",unclear:"Unclear: hard to make out",angry:"Angry but held back"},
+w:[["whisper",3,"secret","breath rather than voice, for secrets or respect"],["murmur",3,"gentle","low, soft, continuous, still understandable"],["mumble",1,"unclear","the words cannot be made out, from shyness"],["mutter",2,"angry","low and annoyed, a private complaint"],["hiss",2,"angry","a sharp angry whisper"],["utter",3,"secret","say a single word or sound, often in the negative"]]},
+
+{id:"loud",dom:"Speaking",title:"Speaking loudly",
+intro:"Loud words differ in pitch and purpose. Deep and commanding, high and frightened, rhythmic and collective: the volume is the same, the sound and the reason are not.",
+ask:"Is the sound deep or high, and is it anger, fear, or a crowd?",
+scale:"How loud",kinds:{deep:"Deep and powerful",high:"High and piercing",crowd:"Together, in rhythm"},
+w:[["exclaim",2,"high","a sudden emotional cry"],["yell",3,"deep","general loud shouting"],["bellow",4,"deep","deep, bull-like roar of anger or command"],["shriek",4,"high","high, piercing cry of fear or laughter"],["roar",4,"deep","the noun: a deep sustained sound"],["chant",3,"crowd","repeated rhythmic words by a group"],["shout down",4,"crowd","silencing a speaker by shouting louder"]]},
+
+{id:"complain",dom:"Speaking",title:"Complaining",
+intro:"Complaining ranges from a single low remark to a habit that defines a person. The words are all mildly negative, but some are far more insulting to the complainer than others.",
+ask:"Is it one remark, a habit, or childish?",
+scale:"How annoying",kinds:{once:"One remark",habit:"An ongoing habit",childish:"Childish and self-pitying"},
+w:[["mutter",1,"once","one low, irritated comment"],["grumble",2,"habit","quiet, persistent, usually harmless complaining"],["moan",2,"habit","everyday complaining, UK usage"],["whine",4,"childish","high, irritating, self-pitying complaint"],["sulk",3,"childish","not speaking at all, in bad temper"],["moan",2,"once","a low sound of pain"]]},
+
+{id:"talk",dom:"Speaking",title:"Talking too much, too fast or badly",
+intro:"These words judge the speech, not just describe it. Some are about length and lack of point, some about speed and nerves, some about a manner that irritates or charms.",
+ask:"Is the problem length, speed, or manner?",
+scale:"How much",kinds:{long:"Too long and unfocused",fast:"Fast and nervous",manner:"A particular manner"},
+w:[["ramble",4,"long","going on and on with no clear point"],["chatter",3,"fast","quick, light, continuous talk"],["babble",4,"fast","fast and excited, hardly making sense"],["blurt out",2,"fast","saying something suddenly without thinking"],["rattle off",3,"fast","saying a list quickly from memory"],["stammer",2,"manner","nervous pauses and repeated sounds"],["drawl",2,"manner","slow, lazy speech with stretched vowels"],["gush",3,"manner","excessive enthusiastic praise"]]},
+
+{id:"sharp",dom:"Speaking",title:"Sharp replies and arguing",
+intro:"Answering back has a scale of aggression, and a kind: quick wit, irritation, or open attack. At the other end sits pleading, where the speaker has no power at all.",
+ask:"Is the reply clever, irritated, or an attack? Or is the speaker begging?",
+scale:"How aggressive",kinds:{quick:"Quick and sharp",attack:"An attack",weak:"From weakness"},
+w:[["retort",2,"quick","a fast, sharp or witty comeback"],["snap",3,"quick","a short irritated reply"],["hiss",3,"attack","angry words in a whisper"],["hit back",3,"attack","responding to criticism with a counter-attack"],["tear into",5,"attack","a fierce, sustained verbal attack"],["lash out",4,"attack","a sudden angry attack"],["plead",1,"weak","begging earnestly"]]},
+
+{id:"interrupt",dom:"Speaking",title:"Interrupting and joining in",
+intro:"Joining a conversation or a room uninvited can be rude, welcome, or violent. The words carry that judgement, so choosing the wrong one changes the story.",
+ask:"Was it welcome, rude, or forceful?",
+scale:"How rude",kinds:{welcome:"Welcome",rude:"Rude",force:"Forceful entry"},
+w:[["chip in",1,"welcome","adding a comment or contributing money, friendly"],["cut in",2,"rude","interrupting, or pushing in front"],["butt in",3,"rude","interrupting rudely"],["burst in",2,"force","entering suddenly and noisily"],["barge in",4,"force","pushing in rudely without permission"],["break in",4,"force","entering illegally, or cutting into talk"],["shout down",4,"rude","stopping someone being heard"]]},
+
+// ---------------- MOVING ----------------
+{id:"slowwalk",dom:"Moving",title:"Walking slowly and calmly",
+intro:"Slow walking is either pleasure or aimlessness. English marks both, and marks scale: a stroll happens in a park, roaming happens across a country.",
+ask:"Is there a destination, and how far does it go?",
+scale:"How far",kinds:{pleasure:"For pleasure",aimless:"No destination",stay:"Staying put"},
+w:[["stroll",1,"pleasure","a relaxed walk for enjoyment"],["amble",1,"pleasure","even slower, unhurried, often older people"],["saunter",1,"pleasure","slow and confident, slightly showing off"],["wander",2,"aimless","walking without a destination"],["roam",4,"aimless","moving freely over a wide area"],["linger",1,"stay","staying on because you do not want to leave"],["hover",1,"stay","waiting nearby, unsure whether to interrupt"]]},
+
+{id:"hardwalk",dom:"Moving",title:"Walking with difficulty",
+intro:"Difficulty in walking has causes, and the word names the cause: injury, tiredness, drunkenness, a single trip. Get the cause wrong and the reader sees the wrong person.",
+ask:"Why is it hard: injury, tiredness, loss of balance, or slowness?",
+scale:"How much difficulty",kinds:{injury:"Injury or age",balance:"Losing balance",tired:"Tiredness or heaviness"},
+w:[["limp",2,"injury","uneven walk because one leg hurts"],["hobble",3,"injury","short awkward steps, pain or old age"],["stumble",2,"balance","one trip, nearly falling"],["stagger",3,"balance","unsteady walking, drunk or hurt"],["lurch",3,"balance","a sudden uncontrolled movement"],["trudge",3,"tired","heavy, slow, tired walking"],["plod along",2,"tired","slow steady movement without energy"],["crawl",4,"tired","on hands and knees, or extremely slowly"]]},
+
+{id:"fast",dom:"Moving",title:"Moving fast",
+intro:"Fast movement splits by size and motive: small quick movements, hurried short runs, full-speed sprints, and running away. The word tells you why the person is moving.",
+ask:"How far, how fast, and are they running towards or away?",
+scale:"How fast",kinds:{small:"Small quick moves",hurry:"In a hurry",escape:"Running away"},
+w:[["dart",3,"small","a sudden short quick move"],["scurry",3,"small","small hurried steps, like a mouse"],["dash",3,"hurry","going somewhere quickly"],["sprint",5,"hurry","full speed over a short distance"],["bolt",5,"escape","sudden panicked escape"],["flee",4,"escape","escaping real danger, formal"],["swerve",4,"small","a sudden change of direction to avoid something"]]},
+
+{id:"sneaky",dom:"Moving",title:"Moving quietly and secretly",
+intro:"Secret movement is about not being noticed, but the words differ in threat: a child tiptoeing to the fridge and a burglar creeping through a house are not the same.",
+ask:"Is the secrecy innocent, guilty, or threatening?",
+scale:"How threatening",kinds:{innocent:"Innocent",guilty:"Mildly guilty",threat:"Threatening"},
+w:[["tiptoe",1,"innocent","walking on your toes to make no noise"],["creep",2,"guilty","moving slowly and carefully to avoid notice"],["sneak",2,"guilty","moving secretly, avoiding being caught"],["sneak off",2,"guilty","leaving a place quietly"],["slip away",1,"innocent","leaving quietly and unnoticed"],["prowl",4,"threat","moving quietly like a hunter"],["slither",3,"threat","sliding smoothly like a snake"]]},
+
+{id:"forceful",dom:"Moving",title:"Purposeful and forceful movement",
+intro:"Determined movement carries emotion: confidence, anger, violence. The same walk across a room can be read as strong or as furious depending on the verb.",
+ask:"Is the force confidence, anger, or destruction?",
+scale:"How forceful",kinds:{confident:"Confident",angry:"Angry",destructive:"Destructive"},
+w:[["stride",2,"confident","long confident steps"],["march",3,"angry","firm regular steps, often angry"],["storm out",4,"angry","leaving angrily and noisily"],["plunge",4,"confident","a sudden dramatic drop or dive"],["trample",4,"destructive","stepping heavily and crushing"],["push through",3,"confident","forcing a plan or yourself through resistance"],["bulldoze through",5,"destructive","forcing something through, ignoring all objections"]]},
+
+// ---------------- LOOKING ----------------
+{id:"brieflook",dom:"Looking",title:"Looking briefly",
+intro:"A quick look can be casual, accidental, or systematic. English has a word for each, and the difference between glance and glimpse is the difference between choosing to look and happening to see.",
+ask:"Did you choose to look, or did you happen to see?",
+scale:"How deliberate",kinds:{chose:"You chose to look",happened:"You happened to see",signal:"A signal with the eyes"},
+w:[["glimpse",1,"happened","seeing something briefly by chance"],["glance",2,"chose","a quick deliberate look"],["scan",3,"chose","looking quickly across everything for something"],["survey",4,"chose","taking in the whole scene carefully"],["blink",1,"signal","quick close and open of both eyes, surprise"],["wink",1,"signal","one eye closed as a shared signal"]]},
+
+{id:"longlook",dom:"Looking",title:"Looking long and hard",
+intro:"A long look is defined by its emotion: love, anger, difficulty seeing, or careful examination. The eyes stay on the object; the word says what the person feels.",
+ask:"Is the look soft, hostile, straining, or examining?",
+scale:"How intense",kinds:{soft:"Soft",hostile:"Hostile",strain:"Straining to see",examine:"Examining"},
+w:[["gaze",2,"soft","long, steady, often admiring"],["stare",3,"hostile","fixed and long, can be rude"],["glare",4,"hostile","an angry fixed look"],["leer",4,"hostile","an unpleasant, lustful look"],["peer",2,"strain","looking hard because it is difficult to see"],["squint",2,"strain","narrowing the eyes against light or distance"],["scrutinise",4,"examine","examining in detail, looking for faults"],["gape",4,"soft","staring open-mouthed in amazement"]]},
+
+// ---------------- DOING ----------------
+{id:"holding",dom:"Doing",title:"Taking and holding",
+intro:"Taking something can be quick, rude, forceful, or desperate. The words differ in speed and in what they say about the taker.",
+ask:"How fast, how forceful, and how desperate?",
+scale:"How forceful",kinds:{quick:"Quick",force:"Forceful",hold:"Holding on"},
+w:[["grab",2,"quick","taking hold quickly, neutral"],["snatch",3,"quick","taking quickly and rudely, or stealing"],["seize",4,"force","taking by force or authority"],["clutch",3,"hold","holding tightly out of fear or need"],["grip",3,"hold","holding firmly and steadily"],["tug",2,"force","a short sharp pull"],["yank",4,"force","a sudden violent pull"],["rummage",1,"quick","searching by moving things around"],["fumble",1,"quick","handling clumsily, often under pressure"]]},
+
+{id:"throwhit",dom:"Doing",title:"Throwing, hitting and breaking",
+intro:"Force and noise are the two scales here. A tap and a bang are the same action at different volumes; a toss and a hurl are the same action at different speeds.",
+ask:"How much force, and how much noise?",
+scale:"How much force",kinds:{throw:"Throwing",hit:"Hitting",push:"Pushing",break:"Breaking"},
+w:[["toss",1,"throw","a light careless throw"],["fling",4,"throw","a violent, careless throw"],["hurl",5,"throw","maximum force, also for insults"],["tap",1,"hit","a light quick knock"],["bang",3,"hit","hitting hard and loudly"],["slam",4,"hit","shutting a door or lid with force"],["nudge",1,"push","a gentle push, often with the elbow"],["shove",4,"push","a rough push"],["smash",4,"break","breaking violently into pieces"],["shatter",5,"break","breaking suddenly into tiny fragments"]]},
+
+{id:"gentle",dom:"Doing",title:"Gentle touch and small actions",
+intro:"Small, gentle actions express care, restraint or delicacy. They are the opposite pole of the force words and often describe affection.",
+ask:"Is it affection, restraint, or delicacy?",
+scale:"How gentle",kinds:{affection:"Affection",restraint:"Restraint",delicate:"Delicate"},
+w:[["stroke",5,"affection","moving the hand gently and repeatedly over"],["pat",4,"affection","a light touch with a flat hand"],["nudge",3,"restraint","a gentle push to get attention"],["nibble",4,"delicate","small careful bites"],["sip",4,"delicate","small slow mouthfuls of a drink"],["tap",3,"restraint","a light knock"],["wriggle",2,"delicate","small twisting movements"]]},
+
+{id:"eating",dom:"Doing",title:"Eating and drinking",
+intro:"Eating words are all about speed and appetite. English has a rich set for greed and hurry, and a smaller set for delicacy.",
+ask:"How fast, how much, and how hungry?",
+scale:"How fast",kinds:{greedy:"Greedy and fast",delicate:"Slow and delicate",state:"The state or the amount"},
+w:[["devour",5,"greedy","eating everything hungrily and fast"],["wolf down",5,"greedy","eating very fast, informal"],["gobble up",4,"greedy","eating quickly and greedily, also of resources"],["gulp",4,"greedy","swallowing in big quick mouthfuls"],["polish off",4,"greedy","finishing all of it quickly and easily"],["nibble",1,"delicate","small careful bites"],["sip",1,"delicate","small slow mouthfuls"],["ravenous",5,"state","extremely hungry"],["feast",4,"state","a large celebratory meal"],["bite",1,"state","a quick small meal, 'grab a bite'"]]},
+
+{id:"writing",dom:"Doing",title:"Writing quickly",
+intro:"Fast writing ranges from tidy note-taking to an unreadable mess, and from careful drafts to work produced without much effort.",
+ask:"Is it readable, and was it careful?",
+scale:"How careless",kinds:{note:"Quick note",messy:"Messy",produce:"Producing work fast"},
+w:[["jot down",1,"note","a quick tidy note"],["scribble",3,"messy","writing fast and untidily"],["scrawl",4,"messy","barely readable writing"],["dash off",3,"produce","writing something quickly, perhaps carelessly"],["knock out",3,"produce","producing work fast without much polish"]]},
+
+// ---------------- DESCRIBING ----------------
+{id:"heatcold",dom:"Describing",title:"Heat and cold",
+intro:"Temperature words add texture: dry or humid heat, mild or bitter cold, formal or informal register. 'Very hot' hides all of that.",
+ask:"Dry or humid? Mild or extreme? Formal or casual?",
+scale:"How extreme",kinds:{hot:"Hot",cold:"Cold"},
+w:[["boiling",3,"hot","very hot, informal exaggeration"],["scorching",4,"hot","dry, burning sun"],["sweltering",4,"hot","humid, sticky, exhausting heat"],["humid",2,"hot","wet air, neutral and technical"],["muggy",3,"hot","unpleasantly warm and damp, informal"],["chilly",1,"cold","a bit cold, jacket weather"],["freezing",3,"cold","very cold, informal"],["bitterly cold",5,"cold","painful, penetrating cold"],["frost",3,"cold","the noun: a thin layer of ice on surfaces"]]},
+
+{id:"weather",dom:"Describing",title:"Rain, wind and sky",
+intro:"Weather vocabulary is precise in English because the weather is discussed constantly. Each word fixes an amount: drizzle is not rain, a gust is not a gale.",
+ask:"How much, and for how long?",
+scale:"How severe",kinds:{rain:"Rain",wind:"Wind",sky:"Sky and air"},
+w:[["drizzle",1,"rain","fine light rain"],["downpour",4,"rain","sudden very heavy rain"],["torrential",5,"rain","rain in great quantity, causing floods"],["blustery",2,"wind","strong gusty wind, annoying not dangerous"],["gust",2,"wind","one sudden rush of wind"],["gale",4,"wind","a very strong sustained wind"],["overcast",2,"sky","the whole sky grey with cloud"],["haze",1,"sky","thin mist or smoke reducing visibility"]]},
+
+{id:"sounds",dom:"Describing",title:"Sounds",
+intro:"Sound nouns describe pitch, weight and duration. The right one lets the reader hear the scene; the wrong one makes a dropped book sound like a car crash.",
+ask:"Deep or high? Short or continuous? Hard objects or voices?",
+scale:"How loud",kinds:{deep:"Deep and low",sharp:"Sharp and hard",high:"High and harsh",silence:"Silence"},
+w:[["hush",1,"silence","sudden silence, often expectant"],["thud",2,"deep","a dull heavy sound of something falling"],["rumble",3,"deep","a low continuous sound, thunder or traffic"],["roar",4,"deep","a loud deep sustained sound"],["clatter",3,"sharp","hard objects hitting each other"],["screech",4,"high","a loud high harsh sound, brakes or birds"],["deafening",5,"deep","so loud you cannot hear anything else"]]},
+
+{id:"size",dom:"Describing",title:"Size and amount",
+intro:"Big and small have formal and informal versions, and physical versus abstract versions. 'Vast' is for areas and sums, 'colossal' for objects, 'immense' for pressure and relief.",
+ask:"Physical or abstract? Formal or casual?",
+scale:"How big",kinds:{small:"Small",big:"Big",emphasis:"Emphasis"},
+w:[["negligible",1,"small","too small to matter, formal"],["minute",1,"small","extremely small, formal"],["tiny",1,"small","very small, everyday"],["substantial",3,"big","considerable, formal, no exaggeration"],["vast",4,"big","huge in area or amount"],["immense",4,"big","huge, often abstract: pressure, relief"],["gigantic",5,"big","huge physical size"],["colossal",5,"big","enormous, often for objects or failures"],["sheer",4,"emphasis","nothing but: sheer luck, sheer size"]]},
+
+{id:"amounts",dom:"Describing",title:"Groups and quantities",
+intro:"Instead of 'a lot of' or 'a few', English uses picture-nouns that also say what the group is like: moving, untidy, tidy, slow, overwhelming.",
+ask:"What does the group look like and how does it move?",
+scale:"How many",kinds:{people:"People and animals",things:"Things",flow:"Flow over time",bits:"Very small amounts"},
+w:[["handful",1,"people","a small number"],["throng",4,"people","a dense crowd of people"],["horde",4,"people","a large unruly crowd, slightly negative"],["swarm",4,"people","a dense moving mass, insects or reporters"],["flock",3,"people","birds, sheep, or people arriving together"],["heap",3,"things","an untidy pile"],["stack",3,"things","a neat pile"],["batch",2,"things","a group produced or processed together"],["trickle",1,"flow","a small slow flow"],["surge",4,"flow","a sudden powerful increase"],["flood",5,"flow","an overwhelming amount arriving at once"],["spree",3,"flow","a burst of activity, shopping or spending"],["scrap",1,"bits","a small leftover piece"],["shred",1,"bits","a tiny torn piece, 'not a shred of'"],["pinch",1,"bits","a tiny amount between finger and thumb"]]},
+
+{id:"good",dom:"Describing",title:"Very good",
+intro:"Praise words are specific about what is good: beauty, faultlessness, cleanliness, humour, attention. Using 'exquisite' for a joke or 'hilarious' for a view sounds wrong because each belongs to a domain.",
+ask:"What exactly is good about it?",
+scale:"How strong",kinds:{beauty:"Beauty",perfect:"Perfection",engaging:"Engaging",practical:"Practical value"},
+w:[["stunning",4,"beauty","extremely beautiful or impressive"],["breathtaking",5,"beauty","so impressive it stops your breath"],["exquisite",5,"beauty","delicate and perfectly made"],["impeccable",4,"perfect","faultless manners, taste or timing"],["flawless",4,"perfect","no mistakes, a perfect execution"],["spotless",3,"perfect","perfectly clean"],["meticulous",3,"perfect","extremely careful about detail"],["hilarious",4,"engaging","extremely funny"],["gripping",4,"engaging","holds your attention completely"],["lucrative",3,"practical","makes a lot of money"],["feasible",2,"practical","can be done in practice"],["viable",2,"practical","can keep working long term"]]},
+
+{id:"bad",dom:"Describing",title:"Very bad, dirty or dull",
+intro:"Bad has kinds: shocking, poor quality, dirty, boring, and infamous. The strength scale exists, but the kind is what makes the word fit.",
+ask:"Is it shocking, low quality, dirty, or boring?",
+scale:"How bad",kinds:{shock:"Shocking",quality:"Poor quality",dirty:"Dirty",boring:"Boring",fame:"Known for bad things"},
+w:[["dreadful",3,"quality","very bad, general"],["atrocious",4,"quality","offensively poor quality"],["appalling",5,"shock","so bad it shocks or disgusts"],["filthy",4,"dirty","disgustingly dirty"],["mundane",2,"boring","ordinary and unexciting"],["tedious",3,"boring","too long and repetitive"],["notorious",3,"fame","famous for something bad"],["flaw",2,"quality","a weakness or defect"],["glitch",1,"quality","a small temporary technical fault"]]},
+
+// ---------------- SITUATIONS ----------------
+{id:"problems",dom:"Situations",title:"Problems and turning points",
+intro:"Events in a story or a project have precise names that say how serious they are and whether they can be overcome. A setback is survivable; an ordeal is suffered; a breakthrough changes everything.",
+ask:"How serious, and can it be overcome?",
+scale:"How serious",kinds:{obstacle:"An obstacle",crisis:"A crisis",change:"A change or turning point",trap:"A trick or trap"},
+w:[["hurdle",2,"obstacle","one problem to clear before progress"],["setback",3,"obstacle","a delay that can be recovered from"],["stalemate",3,"obstacle","stuck, neither side can move"],["ordeal",4,"crisis","a long painful experience"],["turmoil",4,"crisis","confusion and disorder"],["upheaval",4,"crisis","a big disruptive change"],["breakthrough",4,"change","a sudden important advance"],["landmark",4,"change","a famous turning point"],["glimmer",1,"change","a small sign of hope"],["loophole",2,"trap","a gap in the rules that lets you avoid them"],["whim",1,"change","a sudden impulse with no real reason"]]},
+
+{id:"easy",dom:"Situations",title:"Doing things fast or easily",
+intro:"Phrasal verbs for speed describe both the pace and the quality of what was done. Sailing through an exam is a compliment; racing through a presentation is a criticism.",
+ask:"Was it fast because it was easy, or fast because it was rushed?",
+scale:"How fast",kinds:{ease:"Easy",rush:"Rushed",read:"Reading",slow:"Slow"},
+w:[["breeze through",4,"ease","completing easily and confidently"],["sail through",4,"ease","passing a test or interview easily"],["whizz through",5,"ease","finishing very fast"],["race through",5,"rush","rushing, perhaps carelessly"],["rattle off",4,"rush","saying a list quickly from memory"],["dash off",4,"rush","writing something quickly"],["skim through",3,"read","reading fast for the main points"],["leaf through",2,"read","turning pages casually"],["plough through",1,"slow","getting through something long and hard"],["fly by",5,"ease","of time: passing very quickly"],["drag on",1,"slow","of time: going on far too long"]]},
+
+{id:"avoid",dom:"Situations",title:"Avoiding and withdrawing",
+intro:"Avoidance verbs judge the person: opting out is neutral, backing out is letting people down, wriggling out is sly. The scale runs from wise caution to cowardice.",
+ask:"Is the avoidance wise, weak, or sly?",
+scale:"How blameworthy",kinds:{wise:"Wise or neutral",weak:"Weak or fearful",sly:"Sly",silent:"Going silent or distant"},
+w:[["steer clear of",1,"wise","deliberately avoiding trouble"],["opt out of",1,"wise","choosing not to take part, neutral"],["stand aside",1,"wise","stepping out of the way or resigning"],["fend off",1,"wise","defending yourself from questions or attack"],["shy away from",3,"weak","avoiding something from fear or lack of confidence"],["back out of",3,"weak","withdrawing from an agreement"],["pull out of",2,"weak","withdrawing from an event or place"],["duck out of",3,"sly","avoiding a duty, informal"],["wriggle out of",4,"sly","cleverly escaping an obligation"],["skirt around",3,"sly","avoiding a difficult subject"],["tiptoe around",2,"silent","handling a sensitive issue too carefully"],["clam up",2,"silent","suddenly refusing to talk"],["hold back",2,"silent","not saying or doing everything you could"],["keep to yourself",1,"silent","staying private and not mixing"],["drift apart",1,"silent","slowly losing closeness over time"]]},
+
+{id:"getdone",dom:"Situations",title:"Getting things done and deciding",
+intro:"These verb-noun pairs are the working vocabulary of reports and meetings. They cannot be assembled freely: you meet a deadline, you do not catch it. Learning them as fixed pairs is the only way.",
+ask:"Which verb does this noun always take?",
+scale:"How formal",kinds:{effort:"Effort and balance",time:"Time and risk",think:"Thinking and understanding",social:"Social"},
+w:[["make a concerted effort",4,"effort","a deliberate joint effort"],["strike a balance",3,"effort","finding a middle way"],["reach a compromise",3,"effort","agreeing by each giving something up"],["seize the opportunity",3,"effort","taking a chance quickly"],["make a breakthrough",4,"effort","achieving a sudden important advance"],["meet a deadline",2,"time","finishing on time"],["run the risk of",3,"time","being in danger of"],["pose a threat",4,"time","being a danger, formal"],["lose track of",1,"time","no longer knowing"],["bear in mind",2,"think","remembering while deciding"],["draw a conclusion",3,"think","deciding what something means"],["cast doubt on",4,"think","making something less certain"],["shed light on",4,"think","helping to explain"],["gain insight into",4,"think","coming to understand deeply"],["pay attention to",1,"think","noticing and concentrating"],["come to terms with",2,"think","accepting something painful"],["raise awareness",3,"social","making people more aware"],["do someone a favour",1,"social","helping someone out"],["catch someone's eye",1,"social","attracting attention"],["keep a straight face",1,"social","not laughing"],["crack down on",4,"social","taking strong action against"]]},
+
+{id:"phrases",dom:"Situations",title:"Fixed pairs and everyday idioms",
+intro:"Binomials are two words joined by 'and' in a fixed order: you say 'back and forth', never 'forth and back'. They make speech sound natural rather than translated.",
+ask:"Which of these summarises the situation in one breath?",
+scale:"How formal",kinds:{summary:"Summarising a situation",time:"Time and frequency",things:"Things and states",quality:"Judging quality"},
+w:[["by and large",3,"summary","generally speaking"],["pros and cons",2,"summary","advantages and disadvantages"],["give and take",2,"summary","compromise from both sides"],["ups and downs",1,"summary","good times and bad times"],["trial and error",2,"summary","learning by trying and failing"],["more or less",1,"summary","approximately"],["first and foremost",4,"summary","most importantly"],["loud and clear",1,"summary","very clearly understood"],["sooner or later",1,"time","eventually"],["now and then",1,"time","occasionally"],["back and forth",1,"things","moving repeatedly between two places"],["odds and ends",1,"things","various small things"],["bits and pieces",1,"things","small assorted things"],["wear and tear",2,"things","damage from normal use"],["safe and sound",1,"things","unharmed"],["peace and quiet",1,"things","calm and silence"],["tried and tested",2,"quality","proven to work"],["crystal clear",1,"quality","perfectly clear"]]},
+
+{id:"adjnoun",dom:"Situations",title:"Adjectives that belong to their nouns",
+intro:"Some adjective-noun pairs are welded together: a 'heated' debate, a 'hefty' fine, a 'stark' contrast. The adjective on its own is ordinary; with its noun it is what fluent speakers say.",
+ask:"Which adjective does this noun expect?",
+scale:"How strong",kinds:{conflict:"Conflict and pressure",change:"Change and chance",vague:"Vagueness and precision",judge:"Judgement"},
+w:[["a heated debate",3,"conflict","an argument with strong feelings"],["a fierce competition",4,"conflict","intense rivalry"],["a mounting pressure",4,"conflict","pressure that keeps growing"],["a bitter disappointment",4,"judge","a deeply painful letdown"],["a hefty fine",3,"judge","a large financial penalty"],["an utter failure",5,"judge","a complete failure"],["a compelling argument",4,"judge","a powerfully convincing argument"],["a widespread belief",2,"judge","a belief many people hold"],["a golden opportunity",4,"change","a rare valuable chance"],["a sweeping change",4,"change","a change affecting everything"],["a stark contrast",3,"change","a very clear difference"],["a vested interest",3,"conflict","a personal reason to want an outcome"],["a vague idea",1,"vague","an unclear idea"],["a rough estimate",1,"vague","an approximate figure"],["knack",2,"judge","a natural skill for something practical"],["flair",3,"judge","natural talent with style"]]}
+];
+
+const DOMAINS = [["Feelings","#E23D7A"],["Speaking","#2F5BEA"],["Moving","#139E8C"],["Looking","#8B4DD6"],["Doing","#F2762E"],["Describing","#0EA5B7"],["Situations","#6B7A99"]];
 const DB = [
 {"t":"prowl","m":0,"s":"Movement","b":"walk quietly and stealthily, looking for something","d":"to move around quietly and secretly, especially like an animal hunting","n":"Suggests menace or hunting: slow, patient, watchful movement. Often used of animals, burglars or restless people at night.","p":"/praʊl/","e":"A fox prowled around the bins after midnight.","c":["prowl around","prowl through","prowl the streets"],"bs":"The guard walked slowly and quietly around the building, looking for intruders.","cs":"The guard prowled around the building, looking for intruders.","f":["prowled","prowling","prowls"]},
 {"t":"tiptoe","m":0,"s":"Movement","b":"walk very quietly, on the tips of your toes","d":"to walk carefully and quietly so as not to be heard","n":"Careful and considerate: you do not want to disturb anyone. No sense of threat, unlike prowl.","p":"/ˈtɪptəʊ/","e":"She tiptoed past the sleeping baby.","c":["tiptoe into","tiptoe past","tiptoe around a subject"],"bs":"He walked very quietly into the room so he wouldn't wake anyone.","cs":"He tiptoed into the room so he wouldn't wake anyone.","f":["tiptoed","tiptoeing","tiptoes"]},
@@ -643,6 +929,14 @@ const shuffle = a => { a = a.slice(); for(let i=a.length-1;i>0;i--){ const j=Mat
 const forms = item => [item.t, ...(item.f||[])].map(norm);
 function contains(answer, item){ const a = " "+norm(answer)+" "; return forms(item).some(f => a.includes(" "+f+" ")); }
 function lev(a,b){ const m=a.length,n=b.length; const d=Array.from({length:m+1},(_,i)=>[i,...Array(n).fill(0)]); for(let j=1;j<=n;j++)d[0][j]=j; for(let i=1;i<=m;i++)for(let j=1;j<=n;j++)d[i][j]=Math.min(d[i-1][j]+1,d[i][j-1]+1,d[i-1][j-1]+(a[i-1]===b[j-1]?0:1)); return d[m][n]; }
+
+/* concepts */
+const byTerm = Object.fromEntries(DB.map(x=>[x.t,x]));
+const conceptItems = c => c.w.map(w=>byTerm[w[0]]);
+const conceptPct = c => Math.round(c.w.reduce((a,w)=>a+mastery(w[0]),0)/c.w.length*100);
+const domHue = d => (DOMAINS.find(x=>x[0]===d)||["","#2F5BEA"])[1];
+const conceptsOf = term => CONCEPTS.filter(c=>c.w.some(w=>w[0]===term));
+const curConcept = () => sel.c ? CONCEPTS.find(c=>c.id===sel.c) : null;
 function modPct(m){ const items = m==="all" ? DB : DB.filter(x=>x.m===m); return Math.round(items.reduce((s,x)=>s+mastery(x.t),0)/items.length*100); }
 function toast(msg){ const t=$("#toast"); t.textContent=msg; t.classList.add("show"); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove("show"),2600); }
 
@@ -676,26 +970,26 @@ const tagHtml = (item, extra="") => `<span class="tag ${extra}" style="backgroun
    SCREENS
    ========================================================= */
 let view = {name:"home"};
-let sel = {m:"all", sub:"all", mode:"mixed"};
+let sel = {m:"all", sub:"all", mode:"mixed", c:null, cview:"scale"};
 
 function go(v){ view = v; hideFeedback(); window.scrollTo(0,0); render(); }
 
 function render(){
-  ({home:renderHome, module:renderModule, flash:renderFlash, practice:renderPractice, summary:renderSummary, settings:renderSettings})[view.name]();
+  ({home:renderHome, concept:renderConcept, word:renderWord, types:renderTypes, module:renderModule, flash:renderFlash, practice:renderPractice, summary:renderSummary, settings:renderSettings})[view.name]();
 }
 
 /* ---------- Home ---------- */
-function renderHome(){
+function renderTypes(){
   const due = DB.filter(x=>isDue(x.t)).length;
   const pct = Math.min(1, state.dayPoints/state.goal);
   const circ = 2*Math.PI*36;
   app.innerHTML = `
   <div class="screen">
     <div class="topbar">
-      <div><h1>Sharpen</h1><div class="sub">C1 vocabulary trainer</div></div>
-      <button class="icon-btn" aria-label="Settings" onclick="go({name:'settings'})">${ICON.gear}</button>
+      <button class="icon-btn" aria-label="Back" onclick="go({name:'home'})">${ICON.back}</button>
+      <div style="flex:1"><h1 style="font-size:21px">Browse by word type</h1><div class="sub">The same words, grouped by grammar</div></div>
     </div>
-    <div class="today">
+    <div class="today" style="display:none">
       <div>
         <div class="big" style="color:var(--sun)">${ICON.flame}${state.streak}</div>
         <div class="lbl">day streak (days in a row you hit your target)</div>
@@ -725,9 +1019,113 @@ function renderHome(){
     </div>
   </div>`;
 }
-window.openModule = m => { sel.m = m; sel.sub="all"; go({name:"module"}); };
+window.openModule = m => { sel.m = m; sel.sub="all"; sel.c=null; go({name:"module"}); };
 window.startDue = () => { const items = DB.filter(x=>isDue(x.t)); startPractice(items, "mixed"); };
 window.startQuick = () => startPractice(pickItems(DB, 10), "mixed");
+
+
+/* ---------- Home: concepts first ---------- */
+function renderHome(){
+  const due = DB.filter(x=>isDue(x.t)).length;
+  const pct = Math.min(1, state.dayPoints/state.goal);
+  const circ = 2*Math.PI*36;
+  app.innerHTML = `
+  <div class="screen">
+    <div class="topbar">
+      <div><h1>Sharpen</h1><div class="sub">Learn the concept, then the words for it</div></div>
+      <button class="icon-btn" aria-label="Settings" onclick="go({name:'settings'})">${ICON.gear}</button>
+    </div>
+    <div class="today">
+      <div>
+        <div class="big" style="color:var(--sun)">${ICON.flame}${state.streak}</div>
+        <div class="lbl">day streak (days in a row you hit your target)</div>
+        <div class="lbl" style="margin-top:10px;color:#fff">${state.dayPoints} of ${state.goal} points today</div>
+      </div>
+      <div class="ring">
+        <svg viewBox="0 0 84 84"><circle class="c1" cx="42" cy="42" r="36"/><circle class="c2" cx="42" cy="42" r="36" stroke-dasharray="${circ}" stroke-dashoffset="${circ*(1-pct)}"/></svg>
+        <div class="txt">${Math.round(pct*100)}%<small>today</small></div>
+      </div>
+    </div>
+    ${due ? `<button class="btn sun due-btn" onclick="startDue()">Review ${due} word${due===1?"":"s"} due today</button>` : ``}
+    ${DOMAINS.map(([d,h])=>{ const cs = CONCEPTS.filter(c=>c.dom===d); return `
+      <div class="dom"><span class="sw" style="background:${h}"></span><h2 class="sec" style="margin:0">${d}</h2></div>
+      <div class="stack">${cs.map(c=>`<button class="crow" onclick="openConcept('${c.id}')"><span>${esc(c.title)}<small>${c.w.length} words · ${esc(c.scale.toLowerCase())}${Object.keys(c.kinds).length>1?" and kind":""}</small></span><span class="pct">${conceptPct(c)}%</span></button>`).join("")}</div>`; }).join("")}
+    <h2 class="sec" style="margin-top:22px">Other ways in</h2>
+    <div class="stack">
+      <button class="btn ghost" onclick="go({name:'types'})">Browse by word type (verbs, adjectives, phrasal verbs)</button>
+      <button class="btn ghost" onclick="startQuick()">Quick practice: 10 mixed questions</button>
+    </div>
+  </div>`;
+}
+window.openConcept = id => { sel.c = id; sel.m="all"; sel.sub="all"; go({name:"concept"}); };
+
+/* ---------- Concept page ---------- */
+function renderConcept(){
+  const c = curConcept(); if(!c){ go({name:"home"}); return; }
+  const hue = domHue(c.dom);
+  const rows = c.w.map(w=>({t:w[0],lvl:w[1],kind:w[2],shade:w[3],item:byTerm[w[0]]}));
+  const row = r => `<button class="lrow" onclick="openWord('${esc(r.t).replace(/'/g,"\\'")}')">
+      <span class="lv" aria-label="strength ${r.lvl} of 5">${[1,2,3,4,5].map(i=>`<i class="${r.lvl>=i?"on":""}"></i>`).join("")}</span>
+      <span class="tx"><b>${esc(r.t)}</b><span>${esc(r.shade)}</span></span>
+      <span class="dots">${[1,2,3,4].map(i=>`<span class="dot ${mastery(r.t)*4>=i?"on":""}"></span>`).join("")}</span></button>`;
+  let body;
+  if(sel.cview==="scale"){
+    const sorted = rows.slice().sort((a,b)=>a.lvl-b.lvl);
+    body = `<div class="kind">${esc(c.scale)}<small>Weakest at the top, strongest at the bottom</small></div><div class="ladder">${sorted.map(row).join("")}</div>`;
+  } else {
+    body = Object.entries(c.kinds).map(([k,lab])=>{ const rs = rows.filter(r=>r.kind===k); if(!rs.length) return ""; const [h,...d]=lab.split(": "); return `<div class="kind">${esc(h)}<small>${esc(d.join(": "))}</small></div><div class="ladder">${rs.sort((a,b)=>a.lvl-b.lvl).map(row).join("")}</div>`; }).join("");
+  }
+  app.innerHTML = `
+  <div class="screen">
+    <div class="topbar">
+      <button class="icon-btn" aria-label="Back" onclick="go({name:'home'})">${ICON.back}</button>
+      <div style="flex:1"><div class="sub" style="color:${hue}">${esc(c.dom)}</div><h1 style="font-size:22px">${esc(c.title)}</h1></div>
+      <div class="sub">${conceptPct(c)}%</div>
+    </div>
+    <div class="intro">${esc(c.intro)}</div>
+    <div class="ask"><small>Ask yourself</small>${esc(c.ask)}</div>
+    <div class="stack" style="margin-bottom:16px">
+      <button class="btn" onclick="startConceptPractice()">Which word fits? Practise this concept</button>
+      <button class="btn ghost" onclick="startFlash()">Flashcards in order of strength</button>
+    </div>
+    <div class="seg2"><button class="${sel.cview==="scale"?"on":""}" onclick="setCView('scale')">By strength</button><button class="${sel.cview==="kind"?"on":""}" onclick="setCView('kind')">By kind</button></div>
+    ${body}
+  </div>`;
+}
+window.setCView = v => { sel.cview=v; render(); };
+window.startConceptPractice = () => { const c=curConcept(); startPractice(pickItems(conceptItems(c), Math.min(10, c.w.length)), "concept"); };
+
+/* ---------- Word page: the word inside its concept ---------- */
+function renderWord(){
+  const item = byTerm[view.term]; const c = curConcept() || conceptsOf(item.t)[0];
+  const me = c ? c.w.find(w=>w[0]===item.t) : null;
+  const sib = c ? c.w.filter(w=>w[0]!==item.t).sort((a,b)=>a[1]-b[1]) : [];
+  const others = conceptsOf(item.t).filter(x=>x!==c);
+  app.innerHTML = `
+  <div class="screen">
+    <div class="topbar">
+      <button class="icon-btn" aria-label="Back" onclick="go({name:'${c?"concept":"home"}'})">${ICON.back}</button>
+      <div style="flex:1"><div class="sub">${c?esc(c.title):""}</div></div>
+    </div>
+    <div class="wordhead">
+      <div class="term">${esc(item.t)}</div><div class="ipa">${esc(item.p)}</div>
+      <button class="speak" onclick="speak('${esc(item.t).replace(/'/g,"\\'")}')">${ICON.sound} Listen</button>
+      ${me?`<div style="margin-top:12px;font-size:15px;line-height:1.45"><b style="color:var(--sun)">In this concept:</b> ${esc(me[3])}${c.kinds[me[2]]?` <span style="color:#B9C3E6">(${esc(c.kinds[me[2]].split(": ")[0].toLowerCase())}, strength ${me[1]} of 5)</span>`:""}</div>`:""}
+    </div>
+    <div class="q-card">
+      <div class="swap"><div class="from">${esc(item.b)}</div><div class="arrow">becomes</div><div class="to">${esc(item.t)}</div></div>
+      <div class="def">${esc(item.d)}</div>
+      <div class="block"><div class="k">Nuance</div><div class="v">${esc(item.n)}</div></div>
+      <div class="block"><div class="k">Example</div><div class="v"><em>${esc(item.e)}</em> <button class="speak" style="padding:4px 9px;font-size:12px;vertical-align:middle" onclick="speak('${esc(item.e).replace(/'/g,"\\'")}')">${ICON.sound}</button></div></div>
+      <div class="block"><div class="k">Collocations</div><div class="colls">${item.c.map(x=>`<span class="coll">${esc(x)}</span>`).join("")}</div></div>
+    </div>
+    ${sib.length?`<h2 class="sec">Compared with its neighbours</h2>
+    <div class="ladder">${sib.map(w=>`<button class="lrow" onclick="openWord('${esc(w[0]).replace(/'/g,"\\'")}')"><span class="lv">${[1,2,3,4,5].map(i=>`<i class="${w[1]>=i?"on":""}"></i>`).join("")}</span><span class="tx"><b>${esc(w[0])}</b><span>${esc(w[3])}</span></span></button>`).join("")}</div>`:""}
+    ${others.length?`<h2 class="sec">Also part of</h2><div class="stack">${others.map(o=>`<button class="crow" onclick="openConcept('${o.id}')"><span>${esc(o.title)}<small>${esc(o.dom)}</small></span></button>`).join("")}</div>`:""}
+    <div class="stack" style="margin-top:16px"><button class="btn ghost" onclick="startFlash('${esc(item.t).replace(/'/g,"\\'")}')">Flashcard for this word</button></div>
+  </div>`;
+}
+window.openWord = t => go({name:"word", term:t});
 
 /* ---------- Module screen ---------- */
 function renderModule(){
@@ -772,9 +1170,10 @@ window.pickItems = (pool, n) => {
 /* ---------- Flashcards ---------- */
 let fl = null;
 window.startFlash = (startTerm) => {
-  let pool = itemsFor(sel.m, sel.sub);
+  const c = curConcept();
+  let pool = c ? c.w.slice().sort((a,b)=>a[1]-b[1]).map(w=>byTerm[w[0]]) : itemsFor(sel.m, sel.sub);
   if(startTerm){ const i = pool.findIndex(x=>x.t===startTerm); pool = [...pool.slice(i), ...pool.slice(0,i)]; }
-  else pool = pickItems(pool, pool.length);
+  else if(!c) pool = pickItems(pool, pool.length);
   fl = {items:pool, i:0, flipped:false, mastered:0, practice:0};
   go({name:"flash"});
 };
@@ -784,7 +1183,7 @@ function renderFlash(){
   app.innerHTML = `
   <div class="screen">
     <div class="topbar">
-      <button class="icon-btn" aria-label="Close" onclick="go({name:'module'})">${ICON.close}</button>
+      <button class="icon-btn" aria-label="Close" onclick="go({name:sel.c?'concept':'module'})">${ICON.close}</button>
       <div class="bar-track"><div class="bar-fill cobalt" style="width:${fl.i/fl.items.length*100}%"></div></div>
       <div class="sub">${fl.i+1}/${fl.items.length}</div>
     </div>
@@ -803,6 +1202,7 @@ function renderFlash(){
           ${tagHtml(item)}
           <div class="swap"><div class="from">${esc(item.b)}</div><div class="arrow">becomes</div><div class="to">${esc(item.t)}</div></div>
           <div class="def">${esc(item.d)}</div>
+          ${(()=>{ const c=curConcept(); const w=c&&c.w.find(w=>w[0]===item.t); return w?`<div class="block"><div class="k">In "${esc(c.title)}"</div><div class="v">${esc(w[3])} (strength ${w[1]} of 5)</div></div>`:""; })()}
           <div class="block"><div class="k">Nuance</div><div class="v">${esc(item.n)}</div></div>
           <div class="block"><div class="k">Example</div><div class="v"><em>${esc(item.e)}</em> <button class="speak" style="padding:4px 9px;font-size:12px;vertical-align:middle" onclick="event.stopPropagation();speak('${esc(item.e).replace(/'/g,"\\'")}')">${ICON.sound}</button></div></div>
           <div class="block"><div class="k">Collocations</div><div class="colls">${item.c.map(c=>`<span class="coll">${esc(c)}</span>`).join("")}</div></div>
@@ -827,7 +1227,7 @@ window.assess = ok => {
 let pr = null;
 window.startPractice = (items, mode) => {
   if(!items.length){ toast("No words in this set yet"); return; }
-  const types = mode==="mixed" ? ["convert","recall","choose"] : [mode];
+  const types = mode==="mixed" ? ["convert","recall","choose"] : mode==="concept" ? ["fit","fit","convert","choose","recall"] : [mode];
   const qs = items.map((item,i)=>makeQ(item, types[i%types.length]));
   pr = {qs, i:0, right:0, wrong:0, points:0, results:[], answered:false, choice:null};
   go({name:"practice"});
@@ -838,10 +1238,13 @@ function makeQ(item, type){
   const fs = [item.t, ...(item.f||[])].sort((a,b)=>b.length-a.length);
   q.used = item.t;
   for(const f of fs){ if(new RegExp("\\b"+f.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+"\\b","i").test(item.cs)){ q.used=f; break; } }
-  if(type==="choose"){
-    const pool = DB.filter(x=>x!==item && x.m===item.m && !(item.x||[]).includes(x.t) && !(x.x||[]).includes(item.t));
+  if(type==="choose" || type==="fit"){
+    const c = curConcept();
+    const okd = x => x!==item && !(item.x||[]).includes(x.t) && !(x.x||[]).includes(item.t);
+    const cpool = c ? shuffle(conceptItems(c).filter(okd)) : [];
+    const pool = DB.filter(x=>okd(x) && x.m===item.m && !cpool.includes(x));
     const same = shuffle(pool.filter(x=>x.s===item.s)), other = shuffle(pool.filter(x=>x.s!==item.s));
-    const ds = [...same, ...other].slice(0,3);
+    const ds = [...cpool, ...same, ...other].slice(0,3);
     q.options = shuffle([item, ...ds]);
     q.gap = item.cs.replace(new RegExp("\\b"+q.used.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+"\\b","i"),"____");
   }
@@ -867,6 +1270,11 @@ function renderPractice(){
       <button class="btn inline-check" id="checkBtn" onclick="check()">Check</button>
       <div class="block"><div class="k">Nuance</div><div class="v">${esc(item.n)}</div></div>
       <div class="block"><div class="k">Basic equivalent</div><div class="v">${esc(item.b)}</div></div>`;
+  } else if(q.type==="fit"){
+    body = `<div class="q-type">${tagHtml(item)}<span>Which word fits?</span></div>
+      <div class="sit"><small>The situation</small>${esc(item.bs)}</div>
+      <div class="q-prompt" style="font-size:15px">Which word captures exactly this shade of meaning?</div>
+      <div class="opts">${q.options.map((o,i)=>`<button class="opt ${pr.choice===i?"sel":""}" onclick="choose(${i})"><span class="key">${i+1}</span>${esc(o.t)}</button>`).join("")}</div>`;
   } else {
     body = `<div class="q-type">${tagHtml(item)}<span>Choose the word</span></div>
       <div class="q-prompt">Fill the gap with the word whose nuance fits best.</div>
@@ -876,14 +1284,14 @@ function renderPractice(){
   app.innerHTML = `
   <div class="screen">
     <div class="topbar">
-      <button class="icon-btn" aria-label="Close" onclick="go({name:'module'})">${ICON.close}</button>
+      <button class="icon-btn" aria-label="Close" onclick="go({name:sel.c?'concept':'module'})">${ICON.close}</button>
       <div class="bar-track"><div class="bar-fill" style="width:${pr.i/pr.qs.length*100}%"></div></div>
       <div class="sub">${pr.i+1}/${pr.qs.length}</div>
     </div>
     <div class="q-card">${body}</div>
-    ${q.type==="choose"?"":'<div class="kb-space"></div>'}
+    ${(q.type==="choose"||q.type==="fit")?"":'<div class="kb-space"></div>'}
   </div>
-  ${q.type==="choose"?`<div class="dock"><div class="dock-in"><button class="btn" id="checkBtn" onclick="check()" ${pr.choice===null?"disabled":""}>Check</button></div></div>`:""}`;
+  ${(q.type==="choose"||q.type==="fit")?`<div class="dock"><div class="dock-in"><button class="btn" id="checkBtn" onclick="check()" ${pr.choice===null?"disabled":""}>Check</button></div></div>`:""}`;
   app.scrollTop = 0;
   const a = $("#ans"); if(a){ a.addEventListener("keydown", e=>{ if(e.key==="Enter"){ e.preventDefault(); check(); } }); if(pr.i>0) a.focus({preventScroll:true}); }
 }
@@ -916,8 +1324,9 @@ window.check = () => {
   } else {
     const chosen = q.options[pr.choice]; ok = chosen===item;
     document.querySelectorAll(".opt").forEach((el,i)=>{ el.disabled=true; if(q.options[i]===item) el.classList.add("ok"); else if(i===pr.choice) el.classList.add("bad"); });
-    if(ok){ title="Correct"; html=`<p><b>${esc(item.t)}</b> fits because: ${esc(item.n)}</p>`; }
-    else { title="Not quite"; html=`<p><b>${esc(chosen.t)}</b> means ${esc(chosen.b)}. ${esc(chosen.n)}</p><p>Here the sentence needs <b>${esc(item.t)}</b>: ${esc(item.n)}</p>${model}`; }
+    const c = curConcept(); const sh = t => { const w = c && c.w.find(w=>w[0]===t); return w ? `${esc(w[3])} (strength ${w[1]} of 5)` : null; };
+    if(ok){ title="Correct"; html=`<p><b>${esc(item.t)}</b>: ${sh(item.t)||esc(item.n)}</p>${q.type==="fit"?model:""}`; }
+    else { title="Not quite"; html=`<p><b>${esc(chosen.t)}</b> is ${sh(chosen.t)||("used for "+esc(chosen.b)+". "+esc(chosen.n))}</p><p>This situation is <b>${esc(item.t)}</b>: ${sh(item.t)||esc(item.n)}</p>${model}`; }
   }
   pr.answered = true;
   grade(item.t, ok);
@@ -955,7 +1364,7 @@ function renderSummary(){
     ${missed.length ? `<h2 class="sec" style="text-align:left">Worth another look</h2><div class="review-list">${missed.map(r=>`<div class="wrow bad"><span>${esc(r.item.t)}<small>${esc(r.item.b)}</small></span></div>`).join("")}</div>` : (isP ? `<div class="empty">Every answer correct. These words will come back for review in a few days.</div>` : "")}
     <div class="stack">
       ${isP && missed.length ? `<button class="btn sun" onclick="startPractice(${JSON.stringify(missed.map(r=>r.item.t))}.map(t=>DB.find(x=>x.t===t)), 'mixed')">Practise the ${missed.length} you missed</button>` : ""}
-      <button class="btn" onclick="go({name:'home'})">Back to dashboard</button>
+      <button class="btn" onclick="go({name:sel.c?'concept':'home'})">${sel.c?"Back to the concept":"Back to dashboard"}</button>
     </div>
   </div>`;
 }
@@ -982,7 +1391,7 @@ function renderSettings(){
     <div class="setrow" style="flex-direction:column;align-items:stretch;gap:8px"><div>Back up your progress<br><small style="color:var(--ink-3)">Export copies a code to your clipboard. Paste it into Import on any device to restore.</small></div>
       <div style="display:flex;gap:8px"><button class="btn ghost sm" style="flex:1" onclick="exportProgress()">Export</button><button class="btn ghost sm" style="flex:1" onclick="importProgress()">Import</button></div></div>
     <button class="btn ghost" style="color:var(--coral);margin-top:10px" onclick="resetAll()">Reset all progress</button>
-    <div style="text-align:center;color:var(--ink-3);font-size:12px;margin-top:14px">Sharpen version 1.4</div>
+    <div style="text-align:center;color:var(--ink-3);font-size:12px;margin-top:14px">Sharpen version 1.5</div>
     <p style="color:var(--ink-3);font-size:13px;margin-top:16px">Progress is saved in this browser on this device. How review works: each word moves up a level when you get it right and down when you miss it. Higher levels come back less often (1, 3, 7, 14 then 30 days).</p>
   </div>`;
 }
