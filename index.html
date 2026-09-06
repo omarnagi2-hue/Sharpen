@@ -255,6 +255,33 @@ h2.sec{font-size:15px;color:var(--ink-3);font-weight:800;margin:14px 0 10px}
 .collx div{background:var(--paper);border:2px solid var(--line);border-radius:12px;padding:9px 12px}
 .collx b{display:block;font-size:14.5px;color:var(--cobalt)}
 .collx span{display:block;font-size:14px;color:var(--ink-2);font-weight:700;line-height:1.4;margin-top:2px}
+
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tile{background:#fff;border:2px solid var(--line);border-radius:16px;padding:14px 12px;text-align:left;box-shadow:0 3px 0 0 var(--line-2);display:flex;flex-direction:column;gap:6px;min-height:92px}
+.tile .sw{width:22px;height:22px;border-radius:7px}
+.tile b{font-size:16px;color:var(--ink)}
+.tile small{font-size:12.5px;color:var(--ink-3);font-weight:700}
+.tile .bar-track{height:6px;margin-top:auto}
+.cont{background:var(--ink);color:#fff;border-radius:18px;padding:16px 18px;text-align:left;width:100%;display:flex;align-items:center;gap:12px;box-shadow:0 4px 0 0 #0B1230;margin:12px 0 18px}
+.cont b{display:block;font-size:17px}
+.cont small{display:block;color:#B9C3E6;font-size:13px;font-weight:700;margin-top:2px}
+.cont .go{margin-left:auto;background:var(--sun);color:var(--ink);border-radius:99px;padding:8px 14px;font-weight:900;font-size:14px;flex:none}
+.fold{width:100%;text-align:left;background:#fff;border:2px solid var(--line);border-radius:14px;padding:12px 14px;font-weight:800;font-size:15px;color:var(--ink);display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.fold small{color:var(--ink-3);font-weight:700;font-size:13px}
+.fold .chev{transition:.2s;color:var(--ink-3)}
+.fold.open .chev{transform:rotate(180deg)}
+.foldbody{display:none;margin:-4px 0 12px}
+.foldbody.open{display:block}
+.lesson{background:#fff;border:2px solid var(--line);border-radius:20px;padding:20px 18px;box-shadow:0 4px 0 0 var(--line-2);min-height:420px;display:flex;flex-direction:column;gap:12px}
+.lesson .step{font-size:12px;color:var(--ink-3);font-weight:800;text-transform:uppercase;letter-spacing:.05em}
+.lesson h2{font-size:24px;margin:0;line-height:1.2}
+.lesson .shade{font-size:16px;color:var(--cobalt);font-weight:800;line-height:1.4}
+.lesson .cmp{background:var(--paper);border-radius:12px;padding:10px 12px;font-size:14px;line-height:1.45;color:var(--ink-2);font-weight:700}
+.lesson .cmp b{color:var(--ink)}
+.lesson p{margin:0;font-size:15.5px;line-height:1.55;color:var(--ink-2)}
+.miniscale{display:flex;gap:4px;align-items:flex-end;height:22px}
+.miniscale i{flex:1;background:var(--line);border-radius:3px}
+.miniscale i.on{background:var(--cobalt)}
 </style>
 </head>
 <body>
@@ -984,10 +1011,10 @@ const tagHtml = (item, extra="") => `<span class="tag ${extra}" style="backgroun
 let view = {name:"home"};
 let sel = {m:"all", sub:"all", mode:"mixed", c:null, cview:"scale"};
 
-function go(v){ view = v; hideFeedback(); window.scrollTo(0,0); render(); }
+function go(v){ view = v; hideFeedback(); window.scrollTo(0,0); if(sel.c && ["concept","lesson","word"].includes(v.name)){ state.lastC = sel.c; save(); } render(); }
 
 function render(){
-  ({home:renderHome, concept:renderConcept, word:renderWord, types:renderTypes, module:renderModule, flash:renderFlash, practice:renderPractice, summary:renderSummary, settings:renderSettings})[view.name]();
+  ({home:renderHome, area:renderArea, lesson:renderLesson, concept:renderConcept, word:renderWord, types:renderTypes, module:renderModule, flash:renderFlash, practice:renderPractice, summary:renderSummary, settings:renderSettings})[view.name]();
 }
 
 /* ---------- Home ---------- */
@@ -1036,11 +1063,14 @@ window.startDue = () => { const items = DB.filter(x=>isDue(x.t)); startPractice(
 window.startQuick = () => startPractice(pickItems(DB, 10), "mixed");
 
 
-/* ---------- Home: concepts first ---------- */
+/* ---------- Home: one next step and seven doors ---------- */
 function renderHome(){
   const due = DB.filter(x=>isDue(x.t)).length;
   const pct = Math.min(1, state.dayPoints/state.goal);
   const circ = 2*Math.PI*36;
+  const last = CONCEPTS.find(c=>c.id===state.lastC) || CONCEPTS.find(c=>conceptPct(c)<100) || CONCEPTS[0];
+  const lastDone = last.w.filter(w=>state.items[w[0]] && state.items[w[0]].seen>0).length;
+  const domPct = d => { const ws = CONCEPTS.filter(c=>c.dom===d).flatMap(c=>c.w.map(w=>w[0])); return Math.round(ws.reduce((a,t)=>a+mastery(t),0)/ws.length*100); };
   app.innerHTML = `
   <div class="screen">
     <div class="topbar">
@@ -1050,7 +1080,7 @@ function renderHome(){
     <div class="today">
       <div>
         <div class="big" style="color:var(--sun)">${ICON.flame}${state.streak}</div>
-        <div class="lbl">day streak (days in a row you hit your target)</div>
+        <div class="lbl">day streak</div>
         <div class="lbl" style="margin-top:10px;color:#fff">${state.dayPoints} of ${state.goal} points today</div>
       </div>
       <div class="ring">
@@ -1059,17 +1089,72 @@ function renderHome(){
       </div>
     </div>
     ${due ? `<button class="btn sun due-btn" onclick="startDue()">Review ${due} word${due===1?"":"s"} due today</button>` : ``}
-    ${DOMAINS.map(([d,h])=>{ const cs = CONCEPTS.filter(c=>c.dom===d); return `
-      <div class="dom"><span class="sw" style="background:${h}"></span><h2 class="sec" style="margin:0">${d}</h2></div>
-      <div class="stack">${cs.map(c=>`<button class="crow" onclick="openConcept('${c.id}')"><span>${esc(c.title)}<small>${c.w.length} words · ${esc(c.scale.toLowerCase())}${Object.keys(c.kinds).length>1?" and kind":""}</small></span><span class="pct">${conceptPct(c)}%</span></button>`).join("")}</div>`; }).join("")}
-    <h2 class="sec" style="margin-top:22px">Other ways in</h2>
-    <div class="stack">
-      <button class="btn ghost" onclick="go({name:'types'})">Browse by word type (verbs, adjectives, phrasal verbs)</button>
+    <button class="cont" onclick="openConcept('${last.id}')"><span><small>${state.lastC?"Continue":"Start here"} · ${esc(last.dom)}</small><b>${esc(last.title)}</b><small>${lastDone} of ${last.w.length} words seen</small></span><span class="go">Go</span></button>
+    <h2 class="sec">Areas</h2>
+    <div class="tiles">
+      ${DOMAINS.map(([d,h])=>`<button class="tile" onclick="openArea('${d}')"><span class="sw" style="background:${h}"></span><b>${d}</b><small>${CONCEPTS.filter(c=>c.dom===d).length} concepts</small><div class="bar-track"><div class="bar-fill" style="width:${domPct(d)}%;background:${h}"></div></div></button>`).join("")}
+    </div>
+    <div class="stack" style="margin-top:18px">
       <button class="btn ghost" onclick="startQuick()">Quick practice: 10 mixed questions</button>
+      <button class="btn ghost" onclick="go({name:'types'})">Browse by word type</button>
     </div>
   </div>`;
 }
 window.openConcept = id => { sel.c = id; sel.m="all"; sel.sub="all"; go({name:"concept"}); };
+window.openArea = d => { sel.dom = d; go({name:"area"}); };
+
+/* ---------- Area page ---------- */
+function renderArea(){
+  const d = sel.dom; const h = domHue(d); const cs = CONCEPTS.filter(c=>c.dom===d);
+  app.innerHTML = `
+  <div class="screen">
+    <div class="topbar">
+      <button class="icon-btn" aria-label="Back" onclick="go({name:'home'})">${ICON.back}</button>
+      <div style="flex:1"><h1 style="font-size:22px;color:${h}">${esc(d)}</h1><div class="sub">${cs.length} concepts</div></div>
+    </div>
+    <div class="stack">${cs.map(c=>`<button class="crow" onclick="openConcept('${c.id}')"><span>${esc(c.title)}<small>${c.w.length} words</small></span><span class="pct">${conceptPct(c)}%</span></button>`).join("")}</div>
+  </div>`;
+}
+
+/* ---------- Lesson: one card per screen ---------- */
+let ls = null;
+window.startLesson = () => { const c = curConcept(); ls = {c, i:0, words:c.w.slice().sort((a,b)=>a[1]-b[1])}; go({name:"lesson"}); };
+function renderLesson(){
+  const c = ls.c, n = ls.words.length + 2; const i = ls.i;
+  let card;
+  if(i===0){
+    card = `<div class="step">Step 1 of ${n} · the concept</div><h2>${esc(c.title)}</h2><p>${esc(c.intro)}</p>
+      <div class="ask" style="margin:4px 0 0"><small>Ask yourself</small>${esc(c.ask)}</div>
+      <p style="font-size:14px;color:var(--ink-3)">Next: the ${ls.words.length} words, from weakest to strongest.</p>`;
+  } else if(i<=ls.words.length){
+    const w = ls.words[i-1], item = byTerm[w[0]], prev = ls.words[i-2];
+    const kind = c.kinds[w[2]] ? c.kinds[w[2]].split(": ")[0] : "";
+    card = `<div class="step">Step ${i+1} of ${n} · ${esc(c.scale.toLowerCase())} ${w[1]} of 5${kind?" · "+esc(kind.toLowerCase()):""}</div>
+      <div class="miniscale">${[1,2,3,4,5].map(k=>`<i class="${w[1]>=k?"on":""}" style="height:${6+k*3}px"></i>`).join("")}</div>
+      <h2>${esc(item.t)} <button class="speak" style="padding:5px 10px;font-size:12px;vertical-align:middle" onclick="speak('${esc(item.t).replace(/'/g,"\\'")}')">${ICON.sound}</button></h2>
+      <div class="shade">${esc(w[3])}</div>
+      <p>${esc(item.d)}</p>
+      ${prev?`<div class="cmp"><b>Compared with ${esc(prev[0])}</b> (${esc(prev[3])}): ${esc(w[3])}.</div>`:""}
+      ${item.st?`<div class="story"><small>In context</small>${hl(item.st,item)}</div>`:`<p><em>${esc(item.e)}</em></p>`}
+      <button class="btn ghost sm" onclick="openWord('${esc(item.t).replace(/'/g,"\\'")}')">Full entry</button>`;
+  } else {
+    card = `<div class="step">Step ${n} of ${n}</div><h2>Now test the distinctions</h2><p>You have met all ${ls.words.length} words in "${esc(c.title)}". The exercise gives you a situation and asks which word captures it, with the other words of this concept as the alternatives.</p>`;
+  }
+  app.innerHTML = `
+  <div class="screen">
+    <div class="topbar">
+      <button class="icon-btn" aria-label="Close" onclick="go({name:'concept'})">${ICON.close}</button>
+      <div class="bar-track"><div class="bar-fill cobalt" style="width:${i/(n-1)*100}%"></div></div>
+      <div class="sub">${i+1}/${n}</div>
+    </div>
+    <div class="lesson">${card}</div>
+    <div style="display:flex;gap:10px;margin-top:14px">
+      ${i>0?`<button class="btn ghost" style="flex:1" onclick="lessonStep(-1)">Back</button>`:""}
+      ${i<n-1?`<button class="btn" style="flex:2" onclick="lessonStep(1)">Next</button>`:`<button class="btn mint" style="flex:2" onclick="startConceptPractice()">Practise</button>`}
+    </div>
+  </div>`;
+}
+window.lessonStep = d => { ls.i += d; if(ls.i>0 && ls.i<=ls.words.length){ const t = ls.words[ls.i-1][0]; const s = it(t); if(s.seen===0){ s.seen=1; save(); } } window.scrollTo(0,0); app.scrollTop=0; renderLesson(); };
 
 /* ---------- Concept page ---------- */
 function renderConcept(){
@@ -1082,28 +1167,29 @@ function renderConcept(){
       <span class="dots">${[1,2,3,4].map(i=>`<span class="dot ${mastery(r.t)*4>=i?"on":""}"></span>`).join("")}</span></button>`;
   let body;
   if(sel.cview==="scale"){
-    const sorted = rows.slice().sort((a,b)=>a.lvl-b.lvl);
-    body = `<div class="kind">${esc(c.scale)}<small>Weakest at the top, strongest at the bottom</small></div><div class="ladder">${sorted.map(row).join("")}</div>`;
+    body = `<div class="ladder">${rows.slice().sort((a,b)=>a.lvl-b.lvl).map(row).join("")}</div>`;
   } else {
     body = Object.entries(c.kinds).map(([k,lab])=>{ const rs = rows.filter(r=>r.kind===k); if(!rs.length) return ""; const [h,...d]=lab.split(": "); return `<div class="kind">${esc(h)}<small>${esc(d.join(": "))}</small></div><div class="ladder">${rs.sort((a,b)=>a.lvl-b.lvl).map(row).join("")}</div>`; }).join("");
   }
+  const first = c.intro.split(". ")[0] + ".";
   app.innerHTML = `
   <div class="screen">
     <div class="topbar">
-      <button class="icon-btn" aria-label="Back" onclick="go({name:'home'})">${ICON.back}</button>
+      <button class="icon-btn" aria-label="Back" onclick="openArea('${c.dom}')">${ICON.back}</button>
       <div style="flex:1"><div class="sub" style="color:${hue}">${esc(c.dom)}</div><h1 style="font-size:22px">${esc(c.title)}</h1></div>
       <div class="sub">${conceptPct(c)}%</div>
     </div>
-    <div class="intro">${esc(c.intro)}</div>
-    <div class="ask"><small>Ask yourself</small>${esc(c.ask)}</div>
-    <div class="stack" style="margin-bottom:16px">
-      <button class="btn" onclick="startConceptPractice()">Which word fits? Practise this concept</button>
-      <button class="btn ghost" onclick="startFlash()">Flashcards in order of strength</button>
+    <div class="intro" style="margin-bottom:10px">${esc(first)} <button class="fold" style="display:inline;width:auto;border:0;padding:0;margin:0;color:var(--cobalt);background:none;font-size:15px" onclick="toggleFold('introf')">Read more</button>
+      <div class="foldbody" id="introf"><p style="margin:8px 0 0">${esc(c.intro.slice(first.length).trim())}</p><div class="ask" style="margin:10px 0 0"><small>Ask yourself</small>${esc(c.ask)}</div></div></div>
+    <div class="stack" style="margin-bottom:14px">
+      <button class="btn" onclick="startLesson()">Learn: one word at a time</button>
+      <div style="display:flex;gap:10px"><button class="btn ghost sm" style="flex:1" onclick="startConceptPractice()">Practise</button><button class="btn ghost sm" style="flex:1" onclick="startFlash()">Flashcards</button></div>
     </div>
     <div class="seg2"><button class="${sel.cview==="scale"?"on":""}" onclick="setCView('scale')">By strength</button><button class="${sel.cview==="kind"?"on":""}" onclick="setCView('kind')">By kind</button></div>
     ${body}
   </div>`;
 }
+window.toggleFold = id => { const b=$("#"+id); b.classList.toggle("open"); const btn=b.previousElementSibling; if(btn&&btn.classList.contains("fold")) btn.classList.toggle("open"); };
 window.setCView = v => { sel.cview=v; render(); };
 window.startConceptPractice = () => { const c=curConcept(); startPractice(pickItems(conceptItems(c), Math.min(10, c.w.length)), "concept"); };
 
@@ -1130,10 +1216,11 @@ function renderWord(){
       <div class="block"><div class="k">Nuance</div><div class="v">${esc(item.n)}</div></div>
       <div class="block"><div class="k">Example</div><div class="v"><em>${esc(item.e)}</em> <button class="speak" style="padding:4px 9px;font-size:12px;vertical-align:middle" onclick="speak('${esc(item.e).replace(/'/g,"\\'")}')">${ICON.sound}</button></div></div>
       ${storyHtml(item)}
-      <div class="block"><div class="k">Collocations, each with an example</div>${collHtml(item)}</div>
     </div>
-    ${sib.length?`<h2 class="sec">Compared with its neighbours</h2>
-    <div class="ladder">${sib.map(w=>`<button class="lrow" onclick="openWord('${esc(w[0]).replace(/'/g,"\\'")}')"><span class="lv">${[1,2,3,4,5].map(i=>`<i class="${w[1]>=i?"on":""}"></i>`).join("")}</span><span class="tx"><b>${esc(w[0])}</b><span>${esc(w[3])}</span></span></button>`).join("")}</div>`:""}
+    <button class="fold" onclick="toggleFold('collf')">Collocations <small>${item.c.length} phrases${item.ce?", with examples":""}</small><span class="chev">&#9662;</span></button>
+    <div class="foldbody" id="collf">${collHtml(item)}</div>
+    ${sib.length?`<button class="fold" onclick="toggleFold('cmpf')">Compared with its neighbours <small>${sib.length} words</small><span class="chev">&#9662;</span></button>
+    <div class="foldbody" id="cmpf"><div class="ladder">${sib.map(w=>`<button class="lrow" onclick="openWord('${esc(w[0]).replace(/'/g,"\\'")}')"><span class="lv">${[1,2,3,4,5].map(i=>`<i class="${w[1]>=i?"on":""}"></i>`).join("")}</span><span class="tx"><b>${esc(w[0])}</b><span>${esc(w[3])}</span></span></button>`).join("")}</div></div>`:""}
     ${others.length?`<h2 class="sec">Also part of</h2><div class="stack">${others.map(o=>`<button class="crow" onclick="openConcept('${o.id}')"><span>${esc(o.title)}<small>${esc(o.dom)}</small></span></button>`).join("")}</div>`:""}
     <div class="stack" style="margin-top:16px"><button class="btn ghost" onclick="startFlash('${esc(item.t).replace(/'/g,"\\'")}')">Flashcard for this word</button></div>
   </div>`;
@@ -1405,7 +1492,7 @@ function renderSettings(){
     <div class="setrow" style="flex-direction:column;align-items:stretch;gap:8px"><div>Back up your progress<br><small style="color:var(--ink-3)">Export copies a code to your clipboard. Paste it into Import on any device to restore.</small></div>
       <div style="display:flex;gap:8px"><button class="btn ghost sm" style="flex:1" onclick="exportProgress()">Export</button><button class="btn ghost sm" style="flex:1" onclick="importProgress()">Import</button></div></div>
     <button class="btn ghost" style="color:var(--coral);margin-top:10px" onclick="resetAll()">Reset all progress</button>
-    <div style="text-align:center;color:var(--ink-3);font-size:12px;margin-top:14px">Sharpen version 1.6</div>
+    <div style="text-align:center;color:var(--ink-3);font-size:12px;margin-top:14px">Sharpen version 1.7</div>
     <p style="color:var(--ink-3);font-size:13px;margin-top:16px">Progress is saved in this browser on this device. How review works: each word moves up a level when you get it right and down when you miss it. Higher levels come back less often (1, 3, 7, 14 then 30 days).</p>
   </div>`;
 }
