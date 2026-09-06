@@ -33,8 +33,12 @@ body{
 }
 button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
 input,textarea{font:inherit;color:inherit}
-html,body{height:100%;overflow:hidden}
-#app{position:fixed;top:0;left:0;right:0;height:var(--vvh,100%);overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+html,body{height:100%;overflow:hidden;position:relative}
+#app{position:absolute;top:0;left:0;right:0;height:var(--vvh,100%);overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+.kb-space{height:var(--kbres,0px)}
+.inline-check{margin-top:10px;margin-bottom:16px}
+.q-card .helpline{margin-top:8px}
+.q-card .field{font-size:16px}
 #app>.screen{max-width:480px;margin:0 auto}
 .screen{padding:18px 18px 120px}
 .hidden{display:none!important}
@@ -850,16 +854,17 @@ function renderPractice(){
   let body = "";
   if(q.type==="convert"){
     body = `<div class="q-type">${tagHtml(item)}<span>Rewrite the sentence</span></div>
-      <div class="q-prompt">Say the same thing in C1 English, using the more precise word or expression.</div>
+      <div class="q-prompt">Rewrite this in C1 English.</div>
       <div class="q-basic">${esc(item.bs)}</div>
-      <textarea class="field" id="ans" rows="3" placeholder="Type your C1 version here" autocomplete="off" autocapitalize="sentences"></textarea>
-      <div class="helpline"><span class="pill">Hint: starts with "${esc(item.t[0])}"</span><span class="pill">Replaces: ${esc(item.b)}</span></div>`;
+      <textarea class="field" id="ans" rows="2" placeholder="Type your C1 version here" autocomplete="off" autocapitalize="sentences"></textarea>
+      <div class="helpline"><span class="pill">Starts with "${esc(item.t[0])}", replaces: ${esc(item.b)}</span></div>
+      <button class="btn inline-check" id="checkBtn" onclick="check()">Check</button>`;
   } else if(q.type==="recall"){
     body = `<div class="q-type">${tagHtml(item)}<span>Type the word</span></div>
-      <div class="q-prompt">Which C1 word or expression is this?</div>
+      <div class="block"><div class="k">Definition</div><div class="v">${esc(item.d)}</div></div>
       <input class="field" id="ans" placeholder="Type the exact word" autocomplete="off" autocapitalize="none" spellcheck="false">
       <div class="helpline"><span class="pill">${item.t.split(" ").length} word${item.t.split(" ").length>1?"s":""}</span><span class="pill">${esc(item.t.length)} letters incl. spaces</span></div>
-      <div class="block"><div class="k">Definition</div><div class="v">${esc(item.d)}</div></div>
+      <button class="btn inline-check" id="checkBtn" onclick="check()">Check</button>
       <div class="block"><div class="k">Nuance</div><div class="v">${esc(item.n)}</div></div>
       <div class="block"><div class="k">Basic equivalent</div><div class="v">${esc(item.b)}</div></div>`;
   } else {
@@ -876,9 +881,11 @@ function renderPractice(){
       <div class="sub">${pr.i+1}/${pr.qs.length}</div>
     </div>
     <div class="q-card">${body}</div>
+    ${q.type==="choose"?"":'<div class="kb-space"></div>'}
   </div>
-  <div class="dock"><div class="dock-in"><button class="btn" id="checkBtn" onclick="check()" ${q.type==="choose"&&pr.choice===null?"disabled":""}>Check</button></div></div>`;
-  const a = $("#ans"); if(a){ a.focus(); a.addEventListener("keydown", e=>{ if(e.key==="Enter"){ e.preventDefault(); check(); } }); }
+  ${q.type==="choose"?`<div class="dock"><div class="dock-in"><button class="btn" id="checkBtn" onclick="check()" ${pr.choice===null?"disabled":""}>Check</button></div></div>`:""}`;
+  app.scrollTop = 0;
+  const a = $("#ans"); if(a){ a.addEventListener("keydown", e=>{ if(e.key==="Enter"){ e.preventDefault(); check(); } }); if(pr.i>0) a.focus({preventScroll:true}); }
 }
 window.choose = i => { if(pr.answered) return; pr.choice = i; renderPractice(); };
 window.check = () => {
@@ -975,6 +982,7 @@ function renderSettings(){
     <div class="setrow" style="flex-direction:column;align-items:stretch;gap:8px"><div>Back up your progress<br><small style="color:var(--ink-3)">Export copies a code to your clipboard. Paste it into Import on any device to restore.</small></div>
       <div style="display:flex;gap:8px"><button class="btn ghost sm" style="flex:1" onclick="exportProgress()">Export</button><button class="btn ghost sm" style="flex:1" onclick="importProgress()">Import</button></div></div>
     <button class="btn ghost" style="color:var(--coral);margin-top:10px" onclick="resetAll()">Reset all progress</button>
+    <div style="text-align:center;color:var(--ink-3);font-size:12px;margin-top:14px">Sharpen version 1.4</div>
     <p style="color:var(--ink-3);font-size:13px;margin-top:16px">Progress is saved in this browser on this device. How review works: each word moves up a level when you get it right and down when you miss it. Higher levels come back less often (1, 3, 7, 14 then 30 days).</p>
   </div>`;
 }
@@ -995,20 +1003,39 @@ window.resetAll = () => { if(confirm("Delete all your progress on this device?")
 
 window.go = go;
 render();
-// Keep the layout the size of the visible area so the keyboard takes its own space instead of pushing content up
+// Keyboard handling for iPhone: size the app to the visible area, remember the keyboard height and reserve it,
+// and force the viewport to re-measure after the keyboard closes (standalone iOS apps can otherwise stay shrunk).
 (function(){
   const root = document.documentElement;
   const vv = window.visualViewport;
+  let maxH = window.innerHeight;
+  let kbH = +(localStorage.getItem("sharpen-kb")||0);
+  const setRes = () => root.style.setProperty("--kbres", (kbH || Math.round(maxH*0.42)) + "px");
+  setRes();
   function upd(){
     if(!vv) return;
+    maxH = Math.max(maxH, window.innerHeight);
+    const covered = Math.round(maxH - vv.height - vv.offsetTop);
+    if(covered > 120 && document.activeElement && document.activeElement.matches && document.activeElement.matches(".field")){
+      if(Math.abs(covered - kbH) > 8){ kbH = covered; try{ localStorage.setItem("sharpen-kb", kbH); }catch(e){} setRes(); }
+    }
     root.style.setProperty("--vvh", Math.round(vv.height) + "px");
-    const kb = Math.max(0, Math.round(window.innerHeight - vv.height - vv.offsetTop));
-    root.style.setProperty("--kb", kb + "px");
-    if(window.scrollY) window.scrollTo(0,0);
+    root.style.setProperty("--kb", Math.max(0, covered) + "px");
+    if(vv.offsetTop > 0) window.scrollTo(0,0);
+  }
+  function heal(){
+    root.style.setProperty("--kb", "0px");
+    root.style.setProperty("--vvh", "100%");
+    if(maxH - window.innerHeight > 4){
+      const st = app.scrollTop;
+      app.style.display = "none"; void app.offsetHeight; app.style.display = "";
+      app.scrollTop = st;
+    }
+    window.scrollTo(0,0);
+    if(vv) upd();
   }
   if(vv){ vv.addEventListener("resize", upd); vv.addEventListener("scroll", upd); upd(); }
-  document.addEventListener("focusout", ()=>{ setTimeout(()=>{ window.scrollTo(0,0); upd(); }, 60); });
-  document.addEventListener("focusin", e=>{ if(e.target.matches && e.target.matches(".field")) setTimeout(()=>{ upd(); e.target.scrollIntoView({block:"nearest"}); }, 250); });
+  document.addEventListener("focusout", e => { if(e.target.matches && e.target.matches(".field")) setTimeout(heal, 150); });
 })();
 if("serviceWorker" in navigator && location.protocol.startsWith("http")){ navigator.serviceWorker.register("sw.js").catch(()=>{}); }
 </script>
